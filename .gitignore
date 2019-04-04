@@ -6,6 +6,11 @@
 
 # NX stuff
 *.dat
+*.diag
+*.f04
+*.f06
+*.log
+*.op2
 
 # ADINA output files
 *.out
