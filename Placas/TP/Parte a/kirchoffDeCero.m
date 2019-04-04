@@ -39,7 +39,6 @@ end
 isFree = ~isFixed;
 
 syms x y real
-% q = sin(pi*x)*sin(pi*y); % Caso particular para el problema: LA carga == Los desplazamientos. Ver placas-> Ugural.
 
 %% Propiedades del material
 E = 1.000;
@@ -56,23 +55,33 @@ Ke = double(int(int(B'*C*B,x,0,a/(divisionesx-1)),y,0,b/(divisionesy-1))); %Los 
 for e = 1:Nelem
     storeTo = false(dof,1);
     storeTo(elemDof(e,:)) = true;
-%     storeTo = elemDof(e,:);
     Kg(storeTo,storeTo) = Kg(storeTo,storeTo) + Ke;
-%     eval(sum(diag(Ke)))
 end
 
 %% Obtencion vector columna de cargas R
-%Para el caso que quiero b=2, a=2.
+
 p0=1;
-q = p0;%p0*sin(x*pi/a)*sin(y*pi/b);%*sin(pi*x/2)*sin(pi*y/2); % Caso particular para el problema: LA carga == Los desplazamientos. Ver placas-> Ugural.
+q = p0;
 R = zeros(dof,1);
 
-e=1; %Elementos mismo tamaño
+Nint = int(int(N.',x,0,dx),y,0,dy);
+for e = 1:Nelem %FORMA EXACTA MUY LENTA
+    storeTo = false(dof,1);
+    storeTo(elemDof(e,:))=true;
     x1 = min(nodos(elementos(e,:),1));
     x2 = max(nodos(elementos(e,:),1));
     y1 = min(nodos(elementos(e,:),2));
     y2 = max(nodos(elementos(e,:),2));
-A = (x2-x1)*(y2-y1);
+    Q = int(int(N.'*p0,x,0,dx),y,0,dy);
+    R(storeTo)=R(storeTo)+Q;
+end
+
+% e=1; %Elementos mismo tamaño
+%     x1 = min(nodos(elementos(e,:),1));
+%     x2 = max(nodos(elementos(e,:),1));
+%     y1 = min(nodos(elementos(e,:),2));
+%     y2 = max(nodos(elementos(e,:),2));
+% A = (x2-x1)*(y2-y1);
 % for e = 1:Nelem %FORMA Rapida
 %     storeTo = false(dof,1);
 %     storeTo(elemDof(e,:))=true;
@@ -80,22 +89,9 @@ A = (x2-x1)*(y2-y1);
 %     y = (max(nodos(elementos(e,:),2))-min(nodos(elementos(e,:),2)))/2+min(nodos(elementos(e,:),2));
 %     
 %     
-%     Q = eval(N.'*p0*sin(x*pi/a)*sin(y*pi/b)*A);
+%     Q = eval(N.'*p0*A);
 %     R(storeTo)=R(storeTo)+Q;
 % end
-
-Nint = double(int(int(N.',x,0,dx),y,0,dy));
-for e = 1:Nelem %FORMA EXACTA MUY LENTA
-    storeTo = false(dof,1);
-    storeTo(elemDof(e,:))=true;
-%     x1 = min(nodos(elementos(e,:),1));
-%     x2 = max(nodos(elementos(e,:),1));
-%     y1 = min(nodos(elementos(e,:),2));
-%     y2 = max(nodos(elementos(e,:),2));
-%     Q = int(int(N.'*q,x,x1,x2),y,y1,y2);
-    Q = Nint*p0;
-    R(storeTo)=R(storeTo)+Q;
-end
 
 %% Inversion (Cálculo de desplazamientos)
 Dr = Kg(isFree,isFree)\R(isFree);
@@ -125,32 +121,3 @@ end
 qn=double(qn);
 figure
 scatter3(xv,yv,qn);
-
-
-    
-% %% Solucion Exacta
-% Niter = 50;
-% w_max=0;
-% for m = 1:2:Niter
-%    for n = 1:2:Niter %Ugural 4ta ed. Ecuacion (13.22)
-%        w_max=w_max + ((-1).^((m+n)/2-1))/((m*n* ( (m/a)^2+(n/b)^2 )^2)); 
-%    end
-% end
-% 
-% w_max = 16*p0/(pi^6)./F*w_max;
-% fprintf('Para un carga uniforme el desplazamiento maximo es\nw_max=%f\n',w_max)
-% w=D(13*3-2);
-% fprintf('A vos te dio w_max=%f',w)
-%% Sección debug
-% debug=false;
-% if debug==false
-% %     return
-% end
-% fprintf('La matriz rigidez reducida:\n')
-% disp(Kg(isFree,isFree));
-% % fprintf('Las cargas reducidas:\n')
-% % disp(R(isFree));
-% fprintf('Los desplazamientos:\n')
-% disp(D(n2d(13))) %Mi nodo central es el nodo de la mala suerte. Mala eleccion por mi parte
-% 
-% elPloto(nodos,elementos)

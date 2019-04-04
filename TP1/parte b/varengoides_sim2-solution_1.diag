@@ -1,0 +1,70 @@
+
+*** 14:32:43 *** 
+Starting Nastran Exporter
+
+*** 14:32:43 *** 
+Writing file C:\Users\Patricio Whittingslo\Desktop\TP\parte 
+b\varengoides_sim2-solution_1.dat
+ 
+*** 14:32:43 *** 
+Writing NX NASTRAN 11.0 compatible deck
+
+*** 14:32:43 *** 
+Writing Nastran System section
+
+*** 14:32:43 *** 
+Writing File Management section
+
+*** 14:32:43 *** 
+Writing Executive Control section
+
+*** 14:32:43 *** 
+Writing Case Control section
+
+*** 14:32:43 *** 
+Writing Bulk Data section
+
+*** 14:32:43 *** 
+Writing Nodes
+
+*** 14:32:43 *** 
+Writing Elements
+
+*** 14:32:43 *** 
+Writing Physical Properties
+
+*** 14:32:43 *** 
+Writing Materials
+
+*** 14:32:43 *** 
+Writing Degree-of-Freedom Sets
+
+*** 14:32:43 *** 
+Writing Loads and Constraints
+
+*** 14:32:43 *** 
+Writing Coordinate Systems
+
+*** 14:32:43 *** 
+Summary of Bulk Data cards written
+
++----------+----------+
+|   NAME   |  NUMBER  |
++----------+----------+
+| CBEAM    | 162      |
+| CQUAD4   | 550      |
+| GRID     | 564      |
+| MAT1     | 1        |
+| MATT1    | 1        |
+| PARAM    | 6        |
+| PBEAML   | 1        |
+| PLOAD4   | 1        |
+| PSHELL   | 1        |
+| SPC      | 158      |
+| SPCADD   | 1        |
+| TABLEM1  | 3        |
++----------+----------+
+
+*** 14:32:43 *** 
+Nastran Deck Successfully Written
+
