@@ -4,7 +4,7 @@ funcFormaMind8
 
 divisionesx = 25; % Minimo 3 divisiones
 divisionesy = 17; % Minimo 3 divisiones
-a=1.4; b=1; % Tamaño del problema
+a=1.400; b=1.000; % Tamaño del problema
 dx = a/(divisionesx-1);
 dy = b/(divisionesy-1);
 

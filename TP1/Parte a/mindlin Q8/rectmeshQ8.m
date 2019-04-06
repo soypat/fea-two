@@ -9,8 +9,8 @@ xgv = 0:a/(2*divx-2):a;
 ygv = 0:b/(2*divy-2):b;
 nodos = [];
 n=0;
-for nx = 1:length(xgv)
-    for ny = 1:length(ygv)
+for ny = 1:length(ygv)
+    for nx = 1:length(xgv)
         if mod(ny,2)==0 %Entonces cae sobre linea de centro Q8
             if mod(nx,2)==0 % Entonces estoy sobre el centro de un elemento. No hay nodo
                 continue
