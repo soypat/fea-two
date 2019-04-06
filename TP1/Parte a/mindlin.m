@@ -4,7 +4,7 @@ funcFormaMind
 
 divisionesx = 25;
 divisionesy = 17;
-a=1400; b=1000; % Tamaño del problema
+a=1000; b=1000; % Tamaño del problema
 dx = a/(divisionesx-1);
 dy = b/(divisionesy-1);
 
@@ -72,8 +72,8 @@ Ns1 = double(subs(N));
 Kg = sparse(dof,dof);
 for e = 1:Nelem
     Kb = zeros(Ndofporelem);
-    storeTo = false(dof,1);
-    storeTo(elemDof(e,:)) = true;
+    dofIndex = elemDof(e,:);
+    storeTo = elemDof(e,:);
     nodesEle = nodos(elementos(e,:),:);
     Bb = zeros(3,Ndofporelem);
     Bs = zeros(2,Ndofporelem);
@@ -112,8 +112,8 @@ p0 = -0.071; %MPa
 R = zeros(dof,1);
 
 for e = 1:Nelem
-    storeTo = false(dof,1);
-    storeTo(elemDof(e,1:3:end))=true;
+    storeTo = elemDof(e,1:3:end);
+%     storeTo(elemDof(e,1:3:end))=true;
     nodesEle = nodos(elementos(e,:),:);
     for ipg = 1:npg2
         jac = dNs2{ipg}*nodesEle;
@@ -121,6 +121,7 @@ for e = 1:Nelem
         R(storeTo)=R(storeTo)+Q;
     end
 end
+
 %% Solucion
 Dr = Kg(isFree,isFree)\R(isFree);
 
@@ -147,14 +148,14 @@ hold on
 % [X, Y] = meshgrid(xv,yv);
 % surf(X,Y,zv,'FaceAlpha',0.5)
 %% Flo compare
-FloHead=open('flo.mat');
-Df=FloHead.Df;
-Dzf=FloHead.Dzf;
-Kf=FloHead.Kf;
-Rf = FloHead.Rf;
-libre=FloHead.libre;
-Sbf = FloHead.Sbf;
-
-
-scatter3(xv,yv,Dzf)
-legend('Patty','Flo')
+% FloHead=open('flo.mat');
+% Df=FloHead.Df;
+% Dzf=FloHead.Dzf;
+% Kf=FloHead.Kf;
+% Rf = FloHead.Rf;
+% libre=FloHead.libre;
+% Sbf = FloHead.Sbf;
+% 
+% 
+% % scatter3(xv,yv,Dzf)
+% % legend('Patty','Flo')

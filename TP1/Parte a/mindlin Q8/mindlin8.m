@@ -2,8 +2,10 @@ funcFormaMind8
 
 %% Problema - nodos/elementos
 
-divisionesx = 25; % Minimo 3 divisiones
-divisionesy = 17; % Minimo 3 divisiones
+divisionesx = 40; % Minimo 3 divisiones
+divx=divisionesx;
+divisionesy = 30; % Minimo 3 divisiones
+divy=divisionesy;
 a=1.400; b=1.000; % Tamaño del problema
 dx = a/(divisionesx-1);
 dy = b/(divisionesy-1);
@@ -34,10 +36,10 @@ t = a/100; % a mm
 
 F = E*t^3/(12*(1 - NU^2)); %Rigidez ante la flexion
 G = E/(2+2*NU); % Rigidez a la torsion
-Cb = -  [F NU*F 0;
+Cb =   [F NU*F 0;
     NU*F F 0 
     0 0 (1-NU)*F/2];
-Cs = -5/6*[G*t 0;0 G*t];
+Cs = 5/6*[G*t 0;0 G*t];
 C = blkdiag(Cb,Cs);
 
 %% Gauss  2x2      
@@ -76,8 +78,8 @@ Kg = sparse(dof,dof);
 for e = 1:Nelem
     Kb = zeros(Ndofporelem);
     Ks = zeros(Ndofporelem);
-    storeTo = false(dof,1);
-    storeTo(elemDof(e,:)) = true;
+    storeTo = elemDof(e,:);
+%     storeTo(elemDof(e,:)) = true;
     nodesEle = nodos(elementos(e,:),:);
     Bb = zeros(3,Ndofporelem);
     Bs = zeros(2,Ndofporelem);
@@ -127,17 +129,16 @@ end
 isFree = ~isFixed;
 
 %% Cargas
-p0 = -0.071e6 ; %Pa
+p0 = -0.071e6 ; %Pa %Es lo que puso Flo, yo tambien
 
 R = zeros(dof,1);
 
 for e = 1:Nelem
-    storeTo = false(dof,1);
-    storeTo(elemDof(e,1:3:end))=true;
+    storeTo = elemDof(e,1:3:end);
     nodesEle = nodos(elementos(e,:),:);
-    for ipg = 1:npg
-        jac = dNs{ipg}*nodesEle;
-        Q = Ns{ipg}'*p0*wpg(ipg)*det(jac);
+    for ipg = 1:npg3
+        jac = dNs3{ipg}*nodesEle;
+        Q = Ns3{ipg}'*p0*wpg3(ipg)*det(jac);
         R(storeTo)=R(storeTo)+Q;
     end
 end
@@ -148,8 +149,53 @@ Dr = Kg(isFree,isFree)\R(isFree);
 D=zeros(dof,1);
 D(isFree) = Dr;
 
-%% Graficar
+W = D(1:3:end);
+
+W_analytic = zeros(Nnod,1);
+D_err = nan(Nnod,1);
+N=9; %Iteraciones de sol analitica 9 es buen número, converge bastante bien
+for n = 1:Nnod
+    W_analytic(n) = w_analytic(nodos(n,1),nodos(n,2),a,b,N,p0,F);
+    if ~(nodos(n,2)==0 || nodos(n,2)==b ||nodos(n,1)==0 ||nodos(n,1)==a)
+        D_err(n) =  W_analytic(n) - W(n);
+    end
+end
+
+
+% Solución Analitica
+xgv = 0:a/(divx-1):a; ygv = 0:b/(divy-1):b; %GRID VECTORS
+D_analytic = zeros(length(xgv),length(ygv));
+
+% Dm = reshape(D,length(xgv)*3,length(ygv)*3);
+
+for i = 1:length(xgv)
+    for j = 1:length(ygv)
+        D_analytic(i,j) = w_analytic(xgv(i),ygv(j),a,b,N,p0,F);
+    end
+end
+
+% figure
 placaplotQ8(nodos,D)
+hold on
+mesh(xgv,ygv,D_analytic')
+
+title('Desplazamientos nodales y solucion analitica','interpreter','latex')
+legend('Calculados','Sol. Analytica')
+xlabel('$x$ [m]','interpreter','latex')
+ylabel('$y$ [m]','interpreter','latex')
+zlabel('$w$ [m]','interpreter','latex')
+
+% figure
+% scatter3(nodos(:,1),nodos(:,2),D_err)
+% errRel = max(abs(D_err))/max(abs(W_analytic));
+% title(sprintf("Error para placa espesor $t=%0.0f$mm Error relativo: %2.2f\\%%",t*1000,errRel),'interpreter','latex')%Todo ese lio para imprimir un porcentaje
+% xlabel('$x$ [m]','interpreter','latex')
+% ylabel('$y$ [m]','interpreter','latex')
+% zlabel('$w$ [m]','interpreter','latex')
+
+%% Graficar
+
+
 % Dz = zeros(divisionesx,divisionesy); % Matriz superficie
 % xv =[];
 % yv = [];
