@@ -2,9 +2,9 @@ funcFormaMind8
 
 %% Problema - nodos/elementos
 
-divisionesx = 40; % Minimo 3 divisiones
-divisionesy = 40; % Minimo 3 divisiones
-a=1; b=1; % Tamaño del problema
+divisionesx = 25; % Minimo 3 divisiones
+divisionesy = 17; % Minimo 3 divisiones
+a=1.4; b=1; % Tamaño del problema
 dx = a/(divisionesx-1);
 dy = b/(divisionesy-1);
 
@@ -28,70 +28,92 @@ for e = 1:Nelem
 end
 
 %% Propiedades Material
-E = 70e9; %GPa Aluminio
+E = 210e9; %GPa Acero
 NU = 0.3;
-t = a/10000; % a mm
+t = a/100; % a mm
 
 F = E*t^3/(12*(1 - NU^2)); %Rigidez ante la flexion
 G = E/(2+2*NU); % Rigidez a la torsion
-Ck = [F NU*F 0;
+Cb = -  [F NU*F 0;
     NU*F F 0 
     0 0 (1-NU)*F/2];
-Cm = 5/6*[G*t 0;0 G*t];
-C = -blkdiag(Ck,Cm);
+Cs = -5/6*[G*t 0;0 G*t];
+C = blkdiag(Cb,Cs);
 
 %% Gauss  2x2      
-% k   = 1/sqrt(3);
-% % Ubicaciones puntos de Gauss
-% upg = [ -k  -k
-%          k  -k
-%          k   k
-%         -k   k ];
-% npg = size(upg,1);
-% wpg = ones(npg,1);
- 
+k   = 1/sqrt(3);
+% Ubicaciones puntos de Gauss
+upg2 = [ -k  -k
+         k  -k
+         k   k
+        -k   k ];
+npg2 = size(upg2,1);
+wpg2 = ones(npg2,1);
 %% Gauss 3x3 - Full integration
 k=sqrt(0.6);
-upg = [-k -k;-k 0; -k k;0 -k;0 0;0 k;k -k;k 0;k k];
+upg3 = [-k -k;-k 0; -k k;0 -k;0 0;0 k;k -k;k 0;k k];
 k = [5/9;8/9;5/9];
-wpg = reshape(k*k',1,[]);
-npg = length(wpg);
+wpg3 = reshape(k*k',1,[]);
+npg3 = length(wpg3);
 %% Allocate N, B and dN. (va mucho mas rapido con esto)
-Ns = cell(npg,1);
-dNs = cell(npg,1);
-for ipg = 1:npg
-        ksi = upg(ipg,1); eta = upg(ipg,2);
-        dNs{ipg} = double(subs(dN));
-        Ns{ipg} = double(subs(N));
+% GAUSS 3x3
+Ns3 = cell(npg3,1);
+dNs3 = cell(npg3,1);
+for ipg = 1:npg3
+        ksi = upg3(ipg,1); eta = upg3(ipg,2);
+        dNs3{ipg} = double(subs(dN));
+        Ns3{ipg} = double(subs(N));
 end
-%% Obtencion Matriz Rigidez por integracion simbolica No-Isoparametrica
+Ns2 = cell(npg2,1);
+dNs2 = cell(npg2,1);
+for ipg = 1:npg2
+        ksi = upg2(ipg,1); eta = upg2(ipg,2);
+        dNs2{ipg} = double(subs(dN));
+        Ns2{ipg} = double(subs(N));
+end
+%% Obtencion Matriz Rigidez por integracion Isoparametrica
 Kg = sparse(dof,dof);
 for e = 1:Nelem
-    Ke = zeros(Ndofporelem);
+    Kb = zeros(Ndofporelem);
+    Ks = zeros(Ndofporelem);
     storeTo = false(dof,1);
     storeTo(elemDof(e,:)) = true;
     nodesEle = nodos(elementos(e,:),:);
-    Bm = zeros(5,Ndofporelem);
-    for ipg = 1:npg
-        ksi = upg(ipg,1); eta = upg(ipg,2);
+    Bb = zeros(3,Ndofporelem);
+    Bs = zeros(2,Ndofporelem);
+    %% K Bending
+    for ipg = 1:npg3
+        ksi = upg3(ipg,1); eta = upg3(ipg,2);
 
-        Nder=dNs{ipg};
+        Nder=dNs3{ipg};
+        
+        jac = Nder*nodesEle;
+        dNxy = jac\Nder;   % dNxy = inv(jac)*dN     
+        for i = 1:Nnodporelem % Armo matriz B de bending
+            Bb(:,(i*3-2):(i*3)) = [0 dNxy(1,i) 0
+                0 0 dNxy(2,i)
+                0 dNxy(2,i) dNxy(1,i)];
+        end
+        Kb = Kb + Bb'*Cb*Bb*wpg3(ipg)*det(jac);
+    end
+    %% K shear
+    for ipg = 1:npg2
+    ksi = upg2(ipg,1); eta = upg2(ipg,2);
+
+        Nder=dNs2{ipg};
         
         jac = Nder*nodesEle;
         dNxy = jac\Nder;   % dNxy = inv(jac)*dN
+        
         for i = 1:Nnodporelem 
-            Bm(:,(i*3-2):(i*3)) = [0 dNxy(1,i) 0
-                0 0 dNxy(2,i)
-                0 dNxy(2,i) dNxy(1,i)
-                -dNxy(1,i) Ns{ipg}(i) 0
-                -dNxy(2,i) 0 Ns{ipg}(i)]; % Ver cook 15.3-3
+            Bs(:,(i*3-2):(i*3)) = [-dNxy(1,i) Ns2{ipg}(i) 0
+                -dNxy(2,i) 0 Ns2{ipg}(i)]; % Ver cook 15.3-3
         end
-%         Bb = Bm(1:3,:);
-%         Bs = Bm(4:5,:);
-%         Ke = Ke + Bs'*Ck*Bs*wpg(ipg)*det(jac)+Bb'*C*Bb*wpg(ipg)*det(jac);
-        Ke = Ke + Bm'*C*Bm*wpg(ipg)*det(jac);
+        
+        Ks = Ks + Bs'*Cs*Bs*wpg2(ipg)*det(jac);
     end
-    Kg(storeTo,storeTo) = Kg(storeTo,storeTo) + Ke;
+    %% Acople general
+    Kg(storeTo,storeTo) = Kg(storeTo,storeTo) + Kb + Ks;
 end
 
 %% Condiciones de Borde (empotrado)
@@ -105,7 +127,7 @@ end
 isFree = ~isFixed;
 
 %% Cargas
-p0 = 2e5; %Pa
+p0 = -0.071e6 ; %Pa
 
 R = zeros(dof,1);
 
