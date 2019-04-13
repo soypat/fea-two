@@ -3,7 +3,6 @@ clear
 clc
 close all
 tic
-
 %% Datos de entrada
 %A modificar
 Mallado='24X16.xlsx';
@@ -37,7 +36,7 @@ nodos(B(:,1),:)=B(:,2:end);
 %% Definiciones   
 nDofNod = 3;                    % N�mero de grados de libertad por nodo
 nNodEle = 4;                    % N�mero de nodos por elemento
-nel = size(elementos,1);         % N�mero de elementos
+nel = size(elementos,1);        % N�mero de elementos
 nNod = size(nodos,1);           % N�mero de nodos
 nDofTot = nDofNod*nNod;         % N�mero de grados de libertad
 
@@ -80,34 +79,33 @@ for ij=1:4
  end
 A=double(A);
 N=func*A^-1;
-   Nf = N;     
+
 Bsym=sym('B',[3,12]);
 Bsym(1,:)=diff(diff(N,x),x);
 Bsym(2,:)=diff(diff(N,y),y);
 Bsym(3,:)=diff(diff(2*N,x),y);
-Bf = Bsym;
+
 integracionx=[-1,1]*LargoX;
 integraciony=[-1,1]*LargoY;
 Ke=double(int(int(Bsym'*C*Bsym,x,integracionx),y,integraciony)); %Matriz de rigidez de un elemento
-Kef = Ke;
+    
 K=zeros(nDofTot,nDofTot);
 for i=1:nel % Se lo aplica a cada elemento
     eleDofs=node2dof(elementos(i,:),nDofNod);        
     K(eleDofs,eleDofs)=K(eleDofs,eleDofs)+Ke;    
 end
-Kf = K;
 
 %% Carga    
    Q=zeros(12,1);
    Q(1:3:10)=P;
    Re=double(int(int(N'*N*Q,x,integracionx),y,integraciony)); %Fuerza recibida por un elemento
-
+   
 Rvec=zeros(nNod*nDofNod,1);
 for iele=1:nel % Se o aplica a cada elemento
    eleDofs=node2dof(elementos(iele,:),nDofNod);          
    Rvec(eleDofs)=Rvec(eleDofs)+Re;
 end
-Rf = Rvec;
+
 
 %% Desplazamientos
 Fijo = ~reshape(bc',[],1);
@@ -125,8 +123,7 @@ ordenadas=min(nodos(:,2)):(min(nodos(nodos(:,2) ~= min(nodos(:,2)),2))-nodos(1,2
 [X,Y]=meshgrid(absisas,ordenadas);
 
 ZK=reshape(DK(:,1),[size(X,2),size(X,1)]);
-while false
-break 
+
 %% Recuperacion tensiones
 
 % Descomentar para calcular tensiones con elementos kirchhoff
@@ -404,5 +401,5 @@ save('flo','Dzf','Df','Kf','Rf','libre','Sbf');
 % bandplot(elementos,nodos,squeeze(stressK(:,1,:))',[],'k')
 % title('Tensiones Kirchhoff')
 
-end
+
 toc

@@ -1,9 +1,9 @@
-%Placa Kirchoff
+%Placa Kirchoff DEBUG
 
 %% Problema - nodos/elementos
 
-divisionesx = 4;
-divisionesy = 3;
+divisionesx = 25;
+divisionesy = 17;
 a=1.4;b=1; % Tamaño del problema
 dx = a/(divisionesx-1);
 dy = b/(divisionesy-1);
@@ -83,25 +83,6 @@ Dr = Kg(isFree,isFree)\R(isFree);
 D=zeros(dof,1);
 D(isFree) = Dr;
 
-W = D(1:3:end);
-
-W_analytic = zeros(Nnod,1);
-D_err = nan(Nnod,1);
-N=9; %Iteraciones de sol analitica 9 es buen número, converge bastante bien
-for n = 1:Nnod
-    W_analytic(n) = w_analytic(nodos(n,1),nodos(n,2),a,b,N,p0,F);
-    if ~(nodos(n,2)==0 || nodos(n,2)==b ||nodos(n,1)==0 ||nodos(n,1)==a)
-        D_err(n) =  W_analytic(n) - W(n);
-    end
-end
-figure
-scatter3(nodos(:,1),nodos(:,2),D_err,'r')
-errRel = max(abs(D_err))/max(abs(W_analytic));
-title(sprintf("Error para placa espesor $t=%0.0f$mm Error relativo: %f\\%%",t*1000,errRel),'interpreter','latex')%Todo ese lio para imprimir un porcentaje
-xlabel('$x$ [m]','interpreter','latex')
-ylabel('$y$ [m]','interpreter','latex')
-zlabel('$w$ [m]','interpreter','latex')
-return
 %% Grafico de Desplazamientos
 Dz = zeros(divisionesx,divisionesy); % Matriz superficie
 xv =[];
