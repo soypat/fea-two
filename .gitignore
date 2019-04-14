@@ -15,6 +15,14 @@
 # ADINA output files
 *.out
 
+#LaTeX output
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.gz
+*.toc
 
 
 
