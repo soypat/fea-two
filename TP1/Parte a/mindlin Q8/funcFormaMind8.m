@@ -7,7 +7,14 @@ X = [1 eta ksi ksi.^2 ksi.*eta eta.^2 (ksi.^2).*eta ksi.*(eta.^2)];%Cambia de Q4
 Xdx = diff(X,ksi);
 Xdy = diff(X,eta);
 
-uNod = [-1 -1;0 -1;1 -1;1 0;1 1;0 1;-1 1;-1 0];% Cambio mi codigo Q4 para Q8
+uNod = [-1 -1
+        1 -1
+        1 1
+        -1 1
+        0 -1
+        1 0
+        0 1
+        -1 0];
 Nnodporelem = length(uNod);
 Ndofpornod = 3; %Placas Mindlin
 Ndofporelem = Nnodporelem*Ndofpornod;

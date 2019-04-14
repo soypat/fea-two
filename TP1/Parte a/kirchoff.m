@@ -2,8 +2,8 @@
 
 %% Problema - nodos/elementos
 
-divisionesx = 4;
-divisionesy = 3;
+divisionesx = 11;
+divisionesy = 7;
 a=1.4;b=1; % Tamaño del problema
 dx = a/(divisionesx-1);
 dy = b/(divisionesy-1);
@@ -33,7 +33,7 @@ isFixed = false(dof,1);
 % simplementeApoyadoNodos = [1 2 3 4 5 10 15 20 25 24 23 22 21 16 11 6]';
 for n =1:Nnod
     if nodos(n,1)==0 || nodos(n,2)==0 || nodos(n,2)==b || nodos(n,1)==a
-        isFixed(n2d(n))=[true false false];
+        isFixed(n2d(n))=[true true true];
     end
 end
 isFree = ~isFixed;
@@ -66,7 +66,7 @@ for e = 1:Nelem
 end
 
 %% Obtencion vector columna de cargas R
-p0=-0.071e6; %Pa
+p0=-0.05e6; %Pa
 R = zeros(dof,1);
 Nint = int(int(N.',x,[-dx dx]),y,[-dy dy]);
 Q = double(p0*Nint);
@@ -84,7 +84,7 @@ D=zeros(dof,1);
 D(isFree) = Dr;
 
 W = D(1:3:end);
-
+fprintf("w_max = %f",max(abs(W)))
 W_analytic = zeros(Nnod,1);
 D_err = nan(Nnod,1);
 N=9; %Iteraciones de sol analitica 9 es buen número, converge bastante bien

@@ -25,13 +25,22 @@ elseif strcmp(tid,'t3')
 end
 
 %% Mallado
-A=xlsread(Mallado,'Elementos');
-elementos=zeros(size(A,1),size(A,2)-1);
-elementos(A(:,1),:)=A(:,2:end);
-
-B=xlsread(Mallado,'Nodos');
-nodos=zeros(size(B,1),size(B,2)-1);
-nodos(B(:,1),:)=B(:,2:end);
+% A=xlsread(Mallado,'Elementos');
+% elementos=zeros(size(A,1),size(A,2)-1);
+% elementos(A(:,1),:)=A(:,2:end);
+% 
+% B=xlsread(Mallado,'Nodos');
+% nodos=zeros(size(B,1),size(B,2)-1);
+% nodos(B(:,1),:)=B(:,2:end);
+nodos =[0         0
+    0.7000         0
+    1.4000         0
+         0    0.5000
+    1.4000    0.5000
+         0    1.0000
+    0.7000    1.0000
+    1.4000    1.0000];
+elementos = [1     3     8     6     2     5     7     4];
 
 
 %% Definiciones   

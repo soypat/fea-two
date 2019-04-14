@@ -2,11 +2,11 @@ funcFormaMind8
 
 %% Problema - nodos/elementos
 
-divisionesx = 40; % Minimo 3 divisiones
+divisionesx = 11; % Minimo 3 divisiones
 divx=divisionesx;
-divisionesy = 30; % Minimo 3 divisiones
+divisionesy = 7; % Minimo 3 divisiones
 divy=divisionesy;
-a=1.400; b=1.000; % Tamaño del problema
+a=1.4; b=1; % Tamaño del problema
 dx = a/(divisionesx-1);
 dy = b/(divisionesy-1);
 
@@ -129,7 +129,7 @@ end
 isFree = ~isFixed;
 
 %% Cargas
-p0 = -0.071e6 ; %Pa %Es lo que puso Flo, yo tambien
+p0 = -0.05e6 ; %Pa %Es lo que puso Flo, yo tambien
 
 R = zeros(dof,1);
 
@@ -150,7 +150,7 @@ D=zeros(dof,1);
 D(isFree) = Dr;
 
 W = D(1:3:end);
-
+fprintf("w_max=%f",max(abs(W)))
 W_analytic = zeros(Nnod,1);
 D_err = nan(Nnod,1);
 N=9; %Iteraciones de sol analitica 9 es buen número, converge bastante bien
@@ -185,7 +185,66 @@ xlabel('$x$ [m]','interpreter','latex')
 ylabel('$y$ [m]','interpreter','latex')
 zlabel('$w$ [m]','interpreter','latex')
 
+Sb = zeros(Nnodporelem,3,Nelem);
+Ss = zeros(Nnodporelem,2,Nelem);
+% FuncFormas en nodos
+Nsn = cell(Nnodporelem,1);
+dNsn = cell(Nnodporelem,1);
+for inod = 1:Nnodporelem
+        ksi = uNod(inod,1); eta = uNod(inod,2);
+        dNsn{inod} = double(subs(dN));
+        Nsn{inod} = double(subs(shapefuns));
+end
+
+for e = 1:Nelem
+    storeTo = elemDof(e,:);
+    nodesEle = nodos(elementos(e,:),:);
+    Bb = zeros(3,Ndofporelem);
+    Bs = zeros(2,Ndofporelem);
+    for  inod = 1:Nnodporelem
+        ksi = uNod(inod,1); eta = uNod(inod,2);
+        
+        Nder=dNsn{inod};
+        
+        jac = Nder*nodesEle;
+        dNxy = jac\Nder;  % dNxy = inv(jac)*dN     
+        for i = 1:Nnodporelem % Armo matriz B de bending
+            Bb(:,(i*3-2):(i*3)) = [0 dNxy(1,i) 0
+                0 0 dNxy(2,i)
+                0 dNxy(2,i) dNxy(1,i)];
+        end
+        
+        for i = 1:Nnodporelem 
+            Bs(:,(i*3-2):(i*3)) = [-dNxy(1,i) Nsn{inod}(i) 0
+                     -dNxy(2,i) 0 Nsn{inod}(i)]; % Ver cook 15.3-3
+        end
+        
+        Sb(inod,:,e) = Cb*(Bb*D(storeTo));
+        Ss(inod,:,e) = Cs*(Bs*D(storeTo));
+    end
+end
+% myIndex = [1 3 5 7 2 4 6 8];
+% close('all')
 % figure
+% bandplot(elementos,nodos,squeeze(Sb(:,1,:))',[],'k') %bandplot(elementos,nodos,squeeze(stressS(:,1,:))',[],'k')
+% title('Tensiones $\sigma_{xx}$ Mindlin Q8','interpreter','latex')
+% figure
+% bandplot(elementos,nodos,squeeze(Sb(:,2,:))',[],'k') %bandplot(elementos,nodos,squeeze(stressS(:,1,:))',[],'k')
+% title('Tensiones $\sigma_{yy}$ Mindlin Q8','interpreter','latex')
+% figure
+% bandplot(elementos,nodos,squeeze(Sb(:,3,:))',[],'k') %bandplot(elementos,nodos,squeeze(stressS(:,1,:))',[],'k')
+% title('Tensiones $\sigma_{xy}$ Mindlin Q8','interpreter','latex')
+
+figure
+Svm1 = (((Sb(:,1,:)-Sb(:,2,:)).^2+0*(Sb(:,3,:).^2 + Ss(:,1,:).^2+Ss(:,2,:).^2) )./2).^(.5);
+% Svm2 = (( 0*(Sb(:,1,:)-Sb(:,2,:)).^2+3*(0*Sb(:,3,:).^2 + Ss(:,1,:).^2+Ss(:,2,:).^2) )./2).^(.5);
+bandplot(elementos,nodos,squeeze(Svm1)',[],'k') %bandplot(elementos,nodos,squeeze(stressS(:,1,:))',[],'k')
+title('$\sigma_{vm}$ por flexion','interpreter','latex')
+max(max(Svm1))
+% figure
+% bandplot(elementos,nodos,squeeze(Svm2)',[],'k') %bandplot(elementos,nodos,squeeze(stressS(:,1,:))',[],'k')
+% title('$\sigma_{vm}$ por cortes interiores','interpreter','latex')
+
 % scatter3(nodos(:,1),nodos(:,2),D_err)
 % errRel = max(abs(D_err))/max(abs(W_analytic));
 % title(sprintf("Error para placa espesor $t=%0.0f$mm Error relativo: %2.2f\\%%",t*1000,errRel),'interpreter','latex')%Todo ese lio para imprimir un porcentaje
@@ -194,8 +253,6 @@ zlabel('$w$ [m]','interpreter','latex')
 % zlabel('$w$ [m]','interpreter','latex')
 
 %% Graficar
-
-
 % Dz = zeros(divisionesx,divisionesy); % Matriz superficie
 % xv =[];
 % yv = [];

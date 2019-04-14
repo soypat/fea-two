@@ -2,9 +2,9 @@ funcFormaMind
 
 %% Problema - nodos/elementos
 
-divisionesx = 25;
-divisionesy = 17;
-a=1000; b=1000; % Tamaño del problema
+divisionesx = 11;
+divisionesy = 7;
+a=1.4; b=1; % Tamaño del problema
 dx = a/(divisionesx-1);
 dy = b/(divisionesy-1);
 
@@ -28,7 +28,7 @@ for e = 1:Nelem
 end
 
 %% Propiedades Material
-E = 210e3; %GPa Aluminio
+E = 210e9; %GPa Aluminio
 NU = 0.3;
 t = a/100; % a mm
 
@@ -95,19 +95,19 @@ for e = 1:Nelem
 
     Kg(storeTo,storeTo) = Kg(storeTo,storeTo) + Kb+ Ks;
 end
-% (1,1)      7.3346e+11
+
 %% Condiciones de Borde (empotrado)
 isFixed = false(dof,1);
 for n = 1:Nnod
    x = nodos(n,1);y = nodos(n,2);
    if  y ==0 || y == b || x==0 || x ==a 
-       isFixed(n2d(n))=[true false false];
+       isFixed(n2d(n))=[true true true];
    end
 end
 isFree = ~isFixed;
 
 %% Cargas
-p0 = -0.071; %MPa
+p0 = -0.05e6; %MPa
 
 R = zeros(dof,1);
 
@@ -129,6 +129,9 @@ Dr = Kg(isFree,isFree)\R(isFree);
 D=zeros(dof,1);
 D(isFree) = Dr;
 
+W= D(1:3:end);
+
+fprintf("w_maxQ4 = %f",max(abs(W)))
 %% Graficar
 Dz = zeros(divisionesx,divisionesy); % Matriz superficie
 xv =[];

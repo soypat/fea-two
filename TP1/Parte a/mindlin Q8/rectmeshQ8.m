@@ -27,11 +27,24 @@ yelem = (divy-1);
 Nelem = xelem*yelem;
 
 elementos = zeros(Nelem,Nnodporelem);
+% uNod = [-1 -1
+%         1 -1
+%         1 1
+%         -1 1
+%         0 -1
+%         1 0
+%         0 1
+%         -1 0];
+myIndex = [1 3 5 7 2 4 6 8];
+% ConvertToADINA = [1 3 5 7 2 4 6 8];
 for ey = 1:yelem
     for ex = 1:xelem
         elemplace = ex+xelem*(ey-1);
         firstnode = 2*ex-1+(3*divx-1)*(ey-1);
         index = [firstnode firstnode+1 firstnode+2 firstnode+2*divx-ex+1 firstnode+3*divx+1 firstnode+3*divx firstnode+3*divx-1 firstnode+2*divx-ex];
+        index = index(myIndex);
         elementos(elemplace,:) = index;
     end
+% uNod == nodos(elementos,:)
+% un=1
 end
