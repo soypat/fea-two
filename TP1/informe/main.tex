@@ -104,7 +104,14 @@ Se estudia la estructura de la base de un buque empleando el uso del método de 
 \section{Introducción Teórica}
 Se optó por resolver el problema con elementos cascaras de 4 nodos y elementos vigas. Antes de comenzar a modelar se estudió el funcionamiento de los elementos placas (Mindlin y Kirchoff) para tener un concepto fundado de como se pueden emplear y cual es su comportamiento ante casos empotrados y articulados.
 
+En el estudio de placas con pequeñas deformaciones en general toma en cuenta las siguientes suposiciones\cite{ugural2003advanced}
 
+\begin{enumerate}
+	\item La relación entre el espesor de la cascara al radio de curvatura es mucho menor a la unidad
+	\item Desplazamientos son muy pequeños en comparación con el espesor
+	\item Secciones rectas de un elementos, perpendiculares al plano medio, permanecen rectas y perpendiculares al plano \textit{deformado}.
+	\item Se desprecia $\sigma_z$ (al igual que en placas).
+\end{enumerate}
 
 Se entiende un elemento cascara como un elemento con poco espesor de tal forma que no tiene tensiones por corte o flexión. En un elemento placa dominan estas tensiones. 
 
@@ -143,46 +150,7 @@ Los resultados indican que las placas Mindlin se comportan bien para espesores m
 
 Las placas Kirchoff en cambio no exhiben mejora del error relativo con el cambio del espesor y convergen con poco refinamiento. Esto se debe a la libertad de deformación del elemento Kirchoff, permitiendo deformaciones del orden cubico para cada elemento.
 
- \begin{figure}[htb!]
- \centering
- \begin{subfigure}{.33\textwidth}
-   \centering
-   \includegraphics[width=\linewidth]{fig/t1_Error.eps}
-   \caption{Espesor $t=a$}
-   \label{fig:Minderrort1}
- \end{subfigure}%
- \begin{subfigure}{.33\textwidth}
-   \centering
-   \includegraphics[width=\linewidth]{fig/t10_Error.eps}
-   \caption{Espesor $t=\frac{a}{10}$}
-   \label{fig:Minderrort10}
- \end{subfigure}
- \begin{subfigure}{.33\textwidth}
-   \centering
-   \includegraphics[width=\linewidth]{fig/t100_Error.eps}
-   \caption{Espesor $t=\frac{a}{100}$}
- \end{subfigure}
- \caption{Error nodal absoluto (graficado) respecto solución analítica para placas Mindlin Q8 espesor $t=\frac{a}{100}$. 1200 elementos.}
- \label{fig:Minderror}
- \end{figure}
 
- \begin{figure}[htb!]
- \centering
- \begin{subfigure}{.33\textwidth}
-   \centering
-   \includegraphics[width=\linewidth]{fig/6elemKircht100.eps}
-   \caption{6 elementos.}
-   \label{fig:Kirch6elemError}
- \end{subfigure}%
- \begin{subfigure}{.33\textwidth}
-   \centering
-   \includegraphics[width=\linewidth]{fig/t100KirchError.eps}
-   \caption{1200 Elementos.}
-   \label{fig:Kircherrort1200}
- \end{subfigure}
- \caption{Error nodal absoluto (graficado) respecto solución analítica para placas Kirchoff Q4.}
- \label{fig:Minderror}
- \end{figure}
 
 
  \begin{figure}[htb!]
