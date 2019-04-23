@@ -1,4 +1,4 @@
-clear dN N dNaux X dNxx dNyy dNxy 
+clear dN N dNaux X dNxx dNyy dNxy Bs Ns2 Ns3 dNs3 dNs2 
 syms ksi eta real
 
 X = [1 eta ksi ksi.^2 ksi.*eta eta.^2 (ksi.^2).*eta ksi.*(eta.^2)];%Cambia de Q4 a Q8

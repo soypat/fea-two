@@ -1,11 +1,22 @@
-funcFormaMind8
+
 
 %% Problema - nodos/elementos
-
-divisionesx = 11; % Minimo 3 divisiones
+% exp()
+DIVITER = 2.^(1:8)+1;
+errvec = zeros(length(DIVITER),1);
+iter = 0;
+for divy = DIVITER
+    iter = iter+1;
+% divisionesx = 11; % Minimo 3 divisiones
+funcFormaMind8
+divisionesx = ceil(divy*1.4);
+if mod(divisionesx,2)==0
+    divisionesx=divisionesx+1;
+end
 divx=divisionesx;
-divisionesy = 7; % Minimo 3 divisiones
-divy=divisionesy;
+% divisionesy = 7; % Minimo 3 divisiones
+% divy=divisionesy;
+divisionesy = divy;
 a=1.4; b=1; % Tamaño del problema
 dx = a/(divisionesx-1);
 dy = b/(divisionesy-1);
@@ -148,7 +159,6 @@ Dr = Kg(isFree,isFree)\R(isFree);
 
 D=zeros(dof,1);
 D(isFree) = Dr;
-
 W = D(1:3:end);
 fprintf("w_max=%f",max(abs(W)))
 W_analytic = zeros(Nnod,1);
@@ -160,7 +170,15 @@ for n = 1:Nnod
         D_err(n) =  W_analytic(n) - W(n);
     end
 end
+errvec(iter)=max(max(abs(D_err)));
+% err =max(max(abs(D_err)));
+% scatter(divy,err)
+% hold on
+% clear
+end
+plot(DIVITER,errvec)
 
+return
 
 % Solución Analitica
 xgv = 0:a/(divx-1):a; ygv = 0:b/(divy-1):b; %GRID VECTORS

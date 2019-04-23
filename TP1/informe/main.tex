@@ -18,10 +18,10 @@
 
 \usepackage{caption}
 \usepackage{subcaption}
-
+\usepackage{amsmath}
 
 \usepackage{multicol}
-\usepackage{mathastext} %BORRAR O DEJAR: Cambia estilo de la fuente matemática y la deja con aspecto mas "técnico".
+%\usepackage{mathastext} %BORRAR O DEJAR: Cambia estilo de la fuente matemática y la deja con aspecto mas "técnico".
 \usepackage{graphicx}
 \usepackage{hyperref}
 \hypersetup{
@@ -66,9 +66,9 @@
 	\vspace{2cm}
 	{\Large \scshape Elementos Finitos II - 31.92 \par}
 	\vspace{2cm}
-	{\Huge \scshape Acerca del tema de cascaras y placas\par }
+	{\Huge \scshape Estudio del Doble Fondo de un Buque\par }
 	\vspace{.5cm}
-	{\Large Estudio del Doble Fondo de un Buque \par}
+	{\Large Y porque una placa no es una cascara plana \par}
 	\vspace{2cm}
 	{\large \bf Autor \par}
 	\vspace{.5cm}
@@ -88,7 +88,7 @@
 
 
 {\textbf{Problema}}\par
-Se estudió la estructura de la base de un buque empleando el uso del método de elementos finitos. Se partió de la hipótesis de desplazamientos pequeños y material isótropo.
+Se estudia la estructura de la base de un buque empleando el uso del método de elementos finitos. Las hipótesis empleadas son de desplazamientos pequeños y material isótropo.
 
 \begin{multicols}{2}
 	\section*{Glosario}
@@ -110,9 +110,16 @@ Se entiende un elemento cascara como un elemento con poco espesor de tal forma q
 
 
 \subsection{Estudio con placas planas}
-Se resolvió un problema de una placa de espesor $t$ con dimensiones $a\times b$ donde $a=1,4\si{\meter}$ y $b=1\si{\meter}$. El material es acero\footnote{Se utilizo $E=\SI{210}{\giga \pascal}$ y $\nu=0,3$}. Los casos fueron resueltos con presión uniforme $p$ para los espesores $t=a$, $t=\frac{a}{10}$ y $t=\frac{a}{100}$ usando elementos Kirchoff Q4 y Mindlin Q8. Se utilizó un factor de corrección para tensión por corte transverso igual a $k=\frac{5}{6}$ usando integración selecta\citep{cook2007concepts} para placas Mindlin . 
+Las placas a estudiar son del tipo que se puede encontrar en cualquier bilbiografía que trate elasticidad\cite{ugural2003advanced}. Las tensiones estan dadas por 
 
-Los resultados se comparan con la solución analítica para una placa simplemente apoyada\citep{ugural2003advanced}\footnote{Se usó $n=m=9$ dado que convergía bien para ese número de iteraciones.}. Para los casos estudiados el desplazamiento máximo es $w_{\max}(t)\approx \SI{6,71e-9}{\meter}$, $w_{\max}(0,1t)\approx \SI{6,71e-6}{\meter}$, $w_{\max}(0,01t)\approx \SI{6,71e-3}{\meter}$. Como sería de esperar, hay una relación del tipo $w(t)=Ct^3$. Para el caso empotrado no se considero solución analítica debido a la inaccesibilidad de los artículos que trataban una solución. 
+\begin{align} \sigma_{x} &=\frac{E}{1-v^{2}}\left(\varepsilon_{x}+v \varepsilon_{y}\right)=-\frac{E z}{1-v^{2}}\left(\frac{\partial^{2} w}{\partial x^{2}}+v \frac{\partial^{2} w}{\partial y^{2}}\right) \\ \sigma_{y} &=\frac{E}{1-v^{2}}\left(\varepsilon_{y}+v \varepsilon_{x}\right)=-\frac{E z}{1-v^{2}}\left(\frac{\partial^{2} w}{\partial y^{2}}+v \frac{\partial^{2} w}{\partial x^{2}}\right) \\ \tau_{x y} &=\frac{E}{2(1+v)} \gamma_{x y}=-\frac{E z}{1+v} \frac{\partial^{2} w}{\partial x \partial y} 
+\end{align}
+lo que nos dice que las tensiones varían linealmente sobre el espesor de la placa (en $z$), lo que va ser importante para aclarar algunas cosas mas tarde.
+
+
+El problema trata una placa de espesor $t$ con dimensiones $a\times b$ donde $a=1,4\si{\meter}$ y $b=1\si{\meter}$. El material es acero\footnote{$E=\SI{210}{\giga \pascal}$ y $\nu=0,3$}. Los casos son con presión uniforme $p$ para los espesores $t=a$, $t=\frac{a}{10}$ y $t=\frac{a}{100}$ usando elementos Kirchoff Q4 y Mindlin Q8. El factor de corrección para tensión por corte transverso es igual a $k=\frac{5}{6}$ usando integración selecta\citep{cook2007concepts} para placas Mindlin . 
+
+Los resultados se comparan con la solución analítica para una placa simplemente apoyada\citep{ugural2003advanced}\footnote{Utilizando $n=m=9$ dado que convergía bien para ese número de iteraciones.}. Para los casos estudiados el desplazamiento máximo es $w_{\max}(t)\approx \SI{6,71e-9}{\meter}$, $w_{\max}(0,1t)\approx \SI{6,71e-6}{\meter}$, $w_{\max}(0,01t)\approx \SI{6,71e-3}{\meter}$. Como sería de esperar, hay una relación del tipo $w(t)=Ct^3$. Para el caso empotrado no se considera solución analítica debido a la inaccesibilidad de los artículos que trataban una solución. 
 \begin{table}[htb!] 
 	\centering
 	\begin{tabular}{clll}
@@ -123,7 +130,7 @@ Los resultados se comparan con la solución analítica para una placa simplement
 		15552 &  \SI{1,959}{\milli \meter}   &  \SI{1,965}{\milli \meter}  & \SI{1,966}{\milli \meter}\\
 		21600&  \SI{1,959}{\milli \meter}& \SI{1,965}{\milli \meter}  & \SI{1,966}{\milli \meter}
 	\end{tabular}\
-	\caption{Desplazamientos máximos para carga uniforme $p=\SI{5}{\kilo \pascal}$ sobre placa con espesor $t=\frac{a}{100}$. \emph{Aspect ratio} de elementos 4:3. Utilizando integración selecta\citep{cook2007concepts}, el más costoso numéricamente por elemento fue Mindlin Q8 por un margen considerable.}
+	\caption{Desplazamientos máximos para carga uniforme $p=\SI{5}{\kilo \pascal}$ sobre placa con espesor $t=\frac{a}{100}$. Relación de aspecto de elementos 4:3. Utilizando integración selecta\citep{cook2007concepts}, el más costoso numéricamente por elemento fue Mindlin Q8 por un margen considerable.}
 	\label{tab:Convergencia}
 \end{table}
 
