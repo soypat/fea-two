@@ -68,7 +68,7 @@
 	\vspace{2cm}
 	{\Huge \scshape Estudio del Doble Fondo de un Buque\par }
 	\vspace{.5cm}
-	{\Large Y porque una placa no es una cascara plana \par}
+	{\Large Y un estudio de placas preliminar \par}
 	\vspace{2cm}
 	{\large \bf Autor \par}
 	\vspace{.5cm}
@@ -173,9 +173,10 @@ De aquí surge la cuestión si es mejor usar elementos Kirchoff o los Q8 para mo
 
 El espesor es otro factor importante para cuando se tiene que fijar el modelo. No sirve modelar una placa espesa con elementos Mindlin. Sería mejor considerar elementos 3D dado que rápidamente se dispara el error para espesores relativamente pequeños(figura \ref{fig:espesorplacas}). Un espesor $\frac{t}{a}=0.07$ presenta un error relativo de 10\% para el problema estudiado .
 
-Las tensiones son de gran interés para cualquier aplicación de elementos placas. Como vemos en la figura \ref{fig:VM}, los dos casos estudiados presentan diferencias marcadas.  Para la placa empotrada tenemos una curvatura alta en los bordes y menos pronunciada en el centro. Como bien ya sabemos de las ecuaciones \eqref{eq:sigxplacas}, la tensión axíl va mano en mano con dicha curvatura $\frac{\partial^2 w}{\partial x^2}$ y $\frac{\partial^2 w}{\partial y^2}$. Cabe destacar que las mayores tensiones van a estar en los lados mas largos porque son los que precisan girar mayor cantidad en menos distancia para llegar al $w_{\max}$. 
+Las tensiones son de gran interés para cualquier aplicación de elementos placas. Como vemos en la figura \ref{fig:VM}, los dos casos estudiados presentan diferencias marcadas.  Para la placa empotrada tenemos una curvatura alta en los bordes y menos pronunciada en el centro. Como bien ya sabemos de las ecuaciones \eqref{eq:sigxplacas}, la tensión axíl va mano en mano con dicha curvatura $\frac{\partial^2 w}{\partial x^2}$ y $\frac{\partial^2 w}{\partial y^2}$. Cabe destacar que las mayores tensiones van a estar en los lados mas largos porque son los que precisan girar mayor cantidad en menos distancia para llegar al $w_{\max}$. Por ultimo, se menciona el máximo local de tensiones ubicado en el centro de la placa debido a otro máximo de la suma $\frac{\partial^2 w}{\partial y^2}+\frac{\partial^2 w}{\partial x^2}$.
 
 El caso de una placa simplemente apoyada es bien diferente. Al quedar con giro en sus bordes su mayor curvatura quedaría en el centro. Por ende, también estaría allí la mayor tensión axíl.
+
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=.9\textwidth]{fig/errvec.eps}
@@ -215,28 +216,50 @@ El caso de una placa simplemente apoyada es bien diferente. Al quedar con giro e
 
 \clearpage
 \section{Estudio de doble fondo de un buque}
-El buque a estudiar tendrá 5 metros de calado, dándonos una presión sobre el doble fondo de alrededor de $p=5 \si{\kilo \pascal}$. Esta va ser la presión nominal para la cual se va resolver el problema. Debido a la acción ondulatoria de las olas\footnote{Conocido como esfuerzos de quebranto.} el buque en realidad puede ser sometido a una presión aún mayor, por eso se va tomar un factor de seguridad $n=3$ para cuando se optimize. Se van a modelar 4 claras (distancia entre varengas) y una vagra. Las longitudinales van a ser perfiles bulbo $280\times13\si{\milli \meter}$, $300\times 13 \si{\milli \meter}$ para el fondo y el doble fondo, respectivamente. La distancia entre varengas es de $3,25\si{\meter}$ y la distancia entre vagras $4,4\si{\meter}$. Como no se dispones de perfiles bulbo en el programa a usar (NX 11.0 de Siemens) se utilizarán perfiles ``L"{} de características similares. Las dimensiones de los perfiles L se obtuvieron para que los momentos de Inercia $I_z$, $I_y$ sean lo más similares. Se utilizó WRESC\footnote{Whittingslow's Rapid Empirical Section Correlation for bulb-L.} para obtener el perfil adecuado para cada bulbo:
-
-\begin{equation} \label{eq:WREC}
-c = \frac{L}{6,25}  \qquad\qquad d \approx \frac{15,25c}{\sqrt{L}} \qquad \textrm{unidades consistentes}
-\end{equation}
-donde $c$ es el espesor del tramo largo (\SI{13}{\milli \meter} en este caso) mas el sobresaliente del perfil ``L"{} similar. $d$ es el espesor del sobresaliente. $L$ es la longitud identificadora del perfil bulbo. Ecuación verificada para un rango acotado de perfiles bulbo de espesor $13\si{\milli\meter}$.
+El buque a estudiar tendrá 5 metros de calado, dándonos una presión sobre el doble fondo de alrededor de $p=5 \si{\kilo \pascal}$. Esta va ser la presión nominal para la cual se va resolver el problema. Debido a la acción ondulatoria de las olas\footnote{Conocido como esfuerzos de quebranto/arrufo.} el buque en realidad puede ser sometido a una presión aún mayor, por eso se va tomar un factor de seguridad $n=3$ para optimizar. Se van a modelar 4 claras (distancia entre varengas) y una vagra. Las longitudinales van a ser perfiles bulbo $280\times13\si{\milli \meter}$, $300\times 13 \si{\milli \meter}$ para el fondo y el doble fondo, respectivamente. La distancia entre varengas es de $3,25\si{\meter}$ y la distancia entre vagras $4,4\si{\meter}$. Como no se dispones de perfiles bulbo en el programa a usar (NX 11.0 de Siemens) se utilizarán perfiles ``L"{} de características similares. Las dimensiones de los perfiles L se obtuvieron para que los momentos de Inercia $I_z$, $I_y$ sean lo más similares. 
 
 
 \subsection{Método}
+\subsubsection*{Modelo}
+La cátedra de la materia sugiere un modelo diferente al tratado. Sugería modelar el espacio desde el plano de una vagra a la próxima considerando un plano de simetría sobre una y considerar apoyos simples sobre la otra. Las varengas también estarían simplemente apoyadas. Se dispone del siguiente dibujo que se destaca por estar en estado de superposición, sobreacotado y subacotado a la vez.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=.5\textwidth]{fig/modelocatedra.png}
+	\caption{Modelo dado en el enunciado del TP. \textbf{No fue resuelto.} Apoyo simple sobre el plano B, simetría sobre A (ambas son vagras). Apoyos simples sobre varengas.}
+	\label{fig:modelocatedra}
+\end{figure}
+El autor optó por adaptar el modelo comenzando por la normalización de las dimensiones. La figura \ref{fig:modeloTransversal} muestra el corte transversal del modelo tratado. Las condiciones de borde que antes se ubicaban sobre las vagras ahora están en el espacio entre vagras. Esto no debería considerarse más que un cambio estético, ya que matemáticamente ambas estructuras son equivalentes si se emplea la simetría de forma correcta.
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.7\linewidth]{fig/MODELO.eps}
+	\caption{Corte transversal del modelo. La placa superior es el fondo y por el medio queda la vagra. La profundidad (longitud) del modelo es de \SI{16,25}{\meter}.}
+	\label{fig:modeloTransversal}
+\end{figure}
+
+Otros incisos del enunciado:
+\begin{itemize}
+	\item Realizar un modelo de elementos finitos para la estructura del doble fondo considerando 4 claras (distancia) de varengas
+	\item Las varengas límites de la estructura están simplemente apoyadas
+\end{itemize}
+La interpretación más lógica del segundo inciso es modelar la estructura con dos varengas como tapas, cuyas superficies estén simplemente apoyadas, pues si hablará de apoyar los extremos de las varengas estaría rompiendo la simetría sobre una de las vagras. Sin embargo, un lector astuto tal vez se de cuenta que dados los incisos estos, hay otro plano de simetría diferente al de la vagra. Este plano es transversal al modelo y estaría en la linea media entre las dos varengas límites de la estructura. Aplicar simetría resultaría en un modelo de solo dos claras, una \textbf{clara} violación al enunciado.
+
+El autor entonces modifica el modelo, otra vez cambiando los límites de la estructura propuesta. Los límites transversales ahora se encuentran sobre la linea media entre dos varengas. Estas modificaciones permiten ver dentro del modelo cuando se obtiene una solución, dando paso a la rápida iteración de secciones. También se presta a menor confusión al momento del mallado al otorgar espesor a las varengas/vagras, pues no hay que dividir ningún espesor de placa por dos \citep{cook2007concepts} puesto que no hay planos de simetría que cortan nuestras placas.
+
+Se reitera que los dos modelos son validos, y equivalentes. En este trabajo práctico se va tratar solo \textbf{uno.}
+
+\subsubsection*{Condiciones de Borde} 
+
 Se planteo un modelo aprovechando el eje longitudinal simétrico y considerando simetría transversal. Cabe destacar que debido a esta última consideración puede haber discrepancia entre la realidad y lo que se plantea. Es decir, \emph{considerar simetría sobre un eje transversal tomando en cuenta solo 4 claras de distancia es una decisión valida si los esfuerzos se normalizan en magnitud acercándose al borde sin soporte en $z$.\footnote{Se explica a que se refiere con el borde sin soporte en $z$ a continuación.} Caso contrario se debería tomar aún más claras para ver las tensiones mayores que se pueden llegar a alcanzar.}
 
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=.6\textwidth]{fig/modelnx.eps}
+	\caption{Modelo elegido. Linea punteada representa condiciones de borde de simetría según \citep{cook2007concepts}. Linea solida representa condición de borde especial, idéntica a la simetría con soporte agregado en $z$ (saliente a la hoja).}
+\end{figure}
+
+
 La simetría es aplicada de forma que se vean esfuerzos generados por el equilibrio entre las dos fuerzas predominantes en un buque, el peso y la presión hidrostática. Para lograr esto se aplican condiciones de borde de simetría en todos los bordes del modelo y una condición especial en un borde transversal y otro longitudinal. La condición a aplicar es un soporte en la dirección de la gravedad, en este caso, un soporte en $z$. Esto dará luz al efecto ``reacción"{} del peso propio del buque ante la presión hidrostática.
-
-
-
- \begin{figure}[htb!]
-     \centering
-     \includegraphics[width=0.7\linewidth]{fig/MODELO.eps}
-     \caption{Corte transversal del modelo. La placa superior es el fondo y por el medio queda la vagra. La profundidad (longitud) del modelo es de \SI{16,25}{\meter}.}
-     \label{fig:modeloTransversal}
- \end{figure}
-
 
 
 \subsection{Resultados y optimización}
@@ -287,16 +310,55 @@ En la figura \ref{fig:optimizacion} se puede observar que las secciones quedaron
      \label{fig:optimizacion}
  \end{figure}
 
+\subsubsection*{Curvas de Schade}
+H. A. Schade ha publicado una serie de curvas indicativas de desplazamiento bajo carga uniforme en función de varios parámetros para placas reforzadas.
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=.7\textwidth]{fig/placaschade.png}
+	
+	\label{fig:placaschade}
+\end{figure}
+
+Se calcula todos los parámetros para el doble fondo optimizado, cuyo desplazamiento máximo para el estado de cargas resultó ser \SI{9,205}{\milli \meter}. como no se tienen transversales, $i_b=0$.
+\[
+i_{a}=\frac{I_{n a}}{s_{a}}+2\left(\frac{I_{a}-I_{n a}}{b}\right)=703,4\si{\milli \meter^3}
+\]
+donde $I_{na}=I_{a}=\SI{457200}{\milli \meter }^4$ y $b$ es la distancia entre vagras, \SI{4400}{\milli \meter}. $s_a=\SI{650}{\milli \meter}$.
+
+\[
+\eta=\sqrt{\frac{\mathrm{I}_{\mathrm{pa}}}{\mathrm{I}_{\mathrm{na}}} \cdot \frac{\mathrm{I}_{\mathrm{pb}}}{\mathrm{I}_{\mathrm{nb}}}} = 
+\]
+
+
+\[
+\rho=\frac{a}{b} \sqrt{\frac{i_{b}}{i_{a}}}
+\]
+
+\[
+\eta=0,124 \sqrt{\frac{\mathrm{I}^{2}_\mathrm{pb}}{\mathrm{I}_{\mathrm{a}} \mathrm{I}_{\mathrm{nb}}} \frac{b}{s_{\mathrm{b}}}}
+\]
+
+
+
+
+
+
+
+
+
+
+
+
 \section{Conclusión}
 Terminado el proceso de optimización, queda el trabajo de contrastarlo con resultados de la realidad o con bilbiografía. Se invitan futuros ingenieros a comparar los resultados obtenidos con las curvas de Schade\citep{dominguez1969calculo}. Se puede también continuar el trabajo de reafinar las secciones de las longitudinales pues no dejan de estar sobredimensionadas, incluso después de optimización. 
 
-Con esto dicho, el resultado predispone de buenas caracteristicas. Se pueden observar campos de tensiones en el doble fondo (figura \ref{fig:optimizacion}) similares a la de una placa empotrada (figura \ref{fig:VMempotrado}). Se tiene también un pequeño relieve de tensiones en su cara central. Esto se debe a que los longitudinales no son perfectamente rigidos y aportan un pequeño giro a la placa. Se tiene entonces una superposición con el caso mencionado anteriormente, y el estado de tensiones de una placa simplemente apoyada (figura \ref{fig:VMapoyado}).
+Con esto dicho, el resultado predispone de buenas caracteristicas. Se pueden observar campos de tensiones en el doble fondo (figura \ref{fig:optimizacion}) similares a la de una placa empotrada (figura \ref{fig:VMempotrado}). Se tiene también un pequeño relieve de tensiones en su cara central. Esto se debe a que los longitudinales aportan un pequeño giro a la placa al deformarse. Se tiene entonces una superposición con el caso mencionado anteriormente, y el estado de tensiones de una placa simplemente apoyada (figura \ref{fig:VMapoyado}).
 
 En conclusión, un estudio preliminar básico puede ayudar inmensamente llegado al final de un informe, como hemos visto. Se ahorró la necesidad de comparar resultados gracias a la semejanza de placas planas con cascaras.
 
 
 
-
+\clearpage
 \bibliography{labibliografia} % Indica archivo
 \bibliographystyle{plainnat} 
 
