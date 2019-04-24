@@ -94,7 +94,7 @@ Se estudia la estructura de la base de un buque empleando el uso del método de 
 	\section*{Glosario}
 	\glossentry{F}{Rigidez ante la flexión.}
 	\glossentry{p}{Carga de presión.}
-	%\glossentry{x}{}
+	\glossentry{\kappa_{0}}{Curvatura de placa inicial.}
 \end{multicols}
 
 
@@ -102,9 +102,9 @@ Se estudia la estructura de la base de un buque empleando el uso del método de 
 
 
 \section{Introducción Teórica}
-Se optó por resolver el problema con elementos cascaras de 4 nodos y elementos vigas. Antes de comenzar a modelar se estudió el funcionamiento de los elementos placas (Mindlin y Kirchoff) para tener un concepto fundado de como se pueden emplear y cual es su comportamiento ante casos empotrados y articulados.
+Se opta por resolver el problema con elementos cascaras de 4 nodos y elementos vigas. Antes de comenzar a modelar se estudió el funcionamiento de los elementos placas (Mindlin y Kirchoff) para tener un concepto fundado de como se pueden emplear y cual es su comportamiento ante casos empotrados y articulados.
 
-En el estudio de placas con pequeñas deformaciones en general toma en cuenta las siguientes suposiciones\cite{ugural2003advanced}
+En el estudio de cascaras con pequeñas deformaciones en general toma en cuenta las siguientes suposiciones\cite{ugural2003advanced}
 
 \begin{enumerate}
 	\item La relación entre el espesor de la cascara al radio de curvatura es mucho menor a la unidad
@@ -113,20 +113,42 @@ En el estudio de placas con pequeñas deformaciones en general toma en cuenta la
 	\item Se desprecia $\sigma_z$ (al igual que en placas).
 \end{enumerate}
 
-Se entiende un elemento cascara como un elemento con poco espesor de tal forma que no tiene tensiones por corte o flexión. En un elemento placa dominan estas tensiones. 
 
+Los elementos cascaras tienen la ventaja de poder tomar formas curvas, a diferencia de los elementos placas. Las tensiones en las cascaras (\ref{eq:cascaras}) varían de forma lineal a lo largo del espesor y a la vez estas tensiones son inversamente proporcional al espesor \citep{cook2007concepts}.\\
+\begin{equation} \label{eq:cascaras}
+\sigma_{x}=\frac{N_{x}}{t}+\frac{M_{x} z}{t^{3} / 12} \qquad \sigma_{y}=\frac{N_{y}}{t}+\frac{M_{y} z}{t^{3} / 12} \qquad \tau_{x y}=\frac{N_{x y}}{t}+\frac{M_{x y} z}{t^{3} / 12}
+\end{equation}
 
-\subsection{Estudio con placas planas}
-Las placas a estudiar son del tipo que se puede encontrar en cualquier bilbiografía que trate elasticidad\cite{ugural2003advanced}. Las tensiones estan dadas por 
+Los elementos placas tienen similitudes. Las tensiones también (salvo el corte en $zx$) varían de forma lineal, pero a diferencia de las cascaras, las tensiones son exclusivamente inversamente proporcionales al cubo del espesor. No era el caso para las tensiones axiales de $N_x,N_y$ y $N_{xy}$ de las cascaras. Para placas \citep{ugural2003advanced}:
 
-\begin{align} \sigma_{x} &=\frac{E}{1-v^{2}}\left(\varepsilon_{x}+v \varepsilon_{y}\right)=-\frac{E z}{1-v^{2}}\left(\frac{\partial^{2} w}{\partial x^{2}}+v \frac{\partial^{2} w}{\partial y^{2}}\right) \\ \sigma_{y} &=\frac{E}{1-v^{2}}\left(\varepsilon_{y}+v \varepsilon_{x}\right)=-\frac{E z}{1-v^{2}}\left(\frac{\partial^{2} w}{\partial y^{2}}+v \frac{\partial^{2} w}{\partial x^{2}}\right) \\ \tau_{x y} &=\frac{E}{2(1+v)} \gamma_{x y}=-\frac{E z}{1+v} \frac{\partial^{2} w}{\partial x \partial y} 
+\begin{align} \sigma_{x} &=\frac{E}{1-v^{2}}\left(\varepsilon_{x}+v \varepsilon_{y}\right)=-\frac{E z}{1-v^{2}}\left(\frac{\partial^{2} w}{\partial x^{2}}+v \frac{\partial^{2} w}{\partial y^{2}}\right) \label{eq:sigxplacas}\\ \sigma_{y} &=\frac{E}{1-v^{2}}\left(\varepsilon_{y}+v \varepsilon_{x}\right)=-\frac{E z}{1-v^{2}}\left(\frac{\partial^{2} w}{\partial y^{2}}+v \frac{\partial^{2} w}{\partial x^{2}}\right) \\ \tau_{x y} &=\frac{E}{2(1+v)} \gamma_{x y}=-\frac{E z}{1+v} \frac{\partial^{2} w}{\partial x \partial y} 
 \end{align}
-lo que nos dice que las tensiones varían linealmente sobre el espesor de la placa (en $z$), lo que va ser importante para aclarar algunas cosas mas tarde.
+donde las segundas derivadas parciales de los desplazamientos se relacionan al espesor según la constitutiva \ref{eq:constitutive}
 
+\begin{equation} \label{eq:constitutive}
+\left\{\begin{array}{l}{M_{x}} \\ {M_{y}} \\ {M_{x y}}\end{array}\right\} =- \left[ \begin{array}{ccc}{F} & {\nu F} & {0} \\ {\nu F} & {F} & {0} \\ {0} & {0} & {\frac{(1-\nu) F}{2}}\end{array}\right] \left(\left\{\begin{array}{l}{w_{,x x}} \\ {w_{,y y}} \\ {2 w_{,x y}}\end{array}\right\}-\left\{\kappa_{0}\right\} \right)
+\end{equation}
 
-El problema trata una placa de espesor $t$ con dimensiones $a\times b$ donde $a=1,4\si{\meter}$ y $b=1\si{\meter}$. El material es acero\footnote{$E=\SI{210}{\giga \pascal}$ y $\nu=0,3$}. Los casos son con presión uniforme $p$ para los espesores $t=a$, $t=\frac{a}{10}$ y $t=\frac{a}{100}$ usando elementos Kirchoff Q4 y Mindlin Q8. El factor de corrección para tensión por corte transverso es igual a $k=\frac{5}{6}$ usando integración selecta\citep{cook2007concepts} para placas Mindlin . 
+donde $F=\frac{E t^{3}}{12\left(1-\nu^{2}\right)}$ es la rigidez ante la flexión. Resulta aparente ahora que dado un momento sobre la placa (Siendo la curvatura inicial igual a cero) la placa se curvará con un radio proporcional a $1/t^3$. Esta curvatura luego definirá las tensiones vistas en \eqref{eq:sigxplacas}. 
 
-Los resultados se comparan con la solución analítica para una placa simplemente apoyada\citep{ugural2003advanced}\footnote{Utilizando $n=m=9$ dado que convergía bien para ese número de iteraciones.}. Para los casos estudiados el desplazamiento máximo es $w_{\max}(t)\approx \SI{6,71e-9}{\meter}$, $w_{\max}(0,1t)\approx \SI{6,71e-6}{\meter}$, $w_{\max}(0,01t)\approx \SI{6,71e-3}{\meter}$. Como sería de esperar, hay una relación del tipo $w(t)=Ct^3$. Para el caso empotrado no se considera solución analítica debido a la inaccesibilidad de los artículos que trataban una solución. 
+\section{Estudio con placas planas}
+Las placas analizadas son Kirchoff, Mindlin Q4 y Mindlin Q8.
+
+\subsection{Método}
+El problema trata una placa de espesor $t$ con dimensiones $a\times b$ donde $a=1,4\si{\meter}$ y $b=1\si{\meter}$. El material es acero\footnote{$E=\SI{210}{\giga \pascal}$ y $\nu=0,3$}. Los casos son con presión uniforme $p$ para los espesores $t=a$, $t=\frac{a}{10}$ y $t=\frac{a}{100}$. El factor de corrección para tensión por corte transverso es igual a $k=\frac{5}{6}$ usando integración selecta\citep{cook2007concepts} para placas Mindlin . 
+
+Se tiene que para una placa simplemente apoyada con carga uniforme el desplazamiento máximo esta dada por \citep{ugural2003advanced}
+\begin{equation}\label{eq:uguralwmax}
+w_{\max }=\frac{16 p}{\pi^{6} F} \sum_{m}^{\infty} \sum_{n}^{\infty} \frac{(-1)^{\frac{m+n}{2}-1}}{m n\left[(m / a)^{2}+(n / b)^{2}\right]^{2}}\qquad m,n = 1,3,5 \ldots
+\end{equation}
+el cual nos dará el error.
+
+Por ultimo se estudiaron las tensiones para la placa simplemente apoyada en todos sus lados y para el caso empotrado en todos sus lados.
+
+\subsection{Resultados}
+Los resultados se comparan con la solución analítica para una placa simplemente apoyada \eqref{eq:uguralwmax}\footnote{Utilizando $n=m=9$ dado que convergía bien para ese número de iteraciones.}. Para los casos estudiados el desplazamiento máximo es $w_{\max}(t)\approx \SI{6,71e-9}{\meter}$, $w_{\max}(0,1t)\approx \SI{6,71e-6}{\meter}$, $w_{\max}(0,01t)\approx \SI{6,71e-3}{\meter}$. Como sería de esperar, hay una relación del tipo $w(t)=Ct^3$.
+\subsubsection*{Caso Empotrado}
+La tabla \ref{tab:Convergencia} muestra un estudio de convergencia para los elementos. 
 \begin{table}[htb!] 
 	\centering
 	\begin{tabular}{clll}
@@ -137,23 +159,45 @@ Los resultados se comparan con la solución analítica para una placa simplement
 		15552 &  \SI{1,959}{\milli \meter}   &  \SI{1,965}{\milli \meter}  & \SI{1,966}{\milli \meter}\\
 		21600&  \SI{1,959}{\milli \meter}& \SI{1,965}{\milli \meter}  & \SI{1,966}{\milli \meter}
 	\end{tabular}\
-	\caption{Desplazamientos máximos para carga uniforme $p=\SI{5}{\kilo \pascal}$ sobre placa con espesor $t=\frac{a}{100}$. Relación de aspecto de elementos 4:3. Utilizando integración selecta\citep{cook2007concepts}, el más costoso numéricamente por elemento fue Mindlin Q8 por un margen considerable.}
+	\caption{Desplazamientos máximos para carga uniforme $p=\SI{5}{\kilo \pascal}$ sobre placa \textbf{empotrada} con espesor $t=\frac{a}{100}$. Relación de aspecto de elementos 4:3. Utilizando integración selecta\citep{cook2007concepts}, el más costoso numéricamente por elemento fue Mindlin Q8 por un margen considerable.}
 	\label{tab:Convergencia}
 \end{table}
 
+\subsubsection*{Caso simplemente apoyado}
+El gráfico \ref{fig:errorplacas} muestra el error obtenido para las placas usadas con una variada cantidad de elementos para condiciones de carga/apoyo fijas. Los otros dos gráficos muestran el tiempo de cálculo y el efecto de espesor sobre los elementos Mindlin, \ref{fig:timeplacas} y \ref{fig:espesorplacas} respectivamente. Los elementos Kirchoff no fueron analizados por no prestarse cambios de error graves variando el espesor.
+
+\subsection{Conclusiones}
+Los elementos Mindlin Q8 y Kirchoff se prestan a converger rápido y con pocos elementos (figura \ref{fig:errorplacas}). Esto se debe a la gran capacidad de un solo elemento de Kirchoff, permitiendo deformaciones del orden cubico para cada elemento. Los elementos Mindlin Q8 tienen una buena capacidad de captar deformaciones gracias al alto orden de funcionalidad. Los elementos Q4 quedan en tercer lugar. 
+
+De aquí surge la cuestión si es mejor usar elementos Kirchoff o los Q8 para modelar placas planas. Le dirijo la atención al lector a la figura \ref{fig:timeplacas}. Los elementos Kirchoff son costosos desde un punto de vista numérico. La gran ventaja de los elementos Mindlin es la formulación paramétrica que permite una integración rápida por puntos de Gauss. Los elementos Q4 merecen una mención honorable por permitir modelar grandes cantidades de elementos sin impedimento en el tiempo de resolución. 
+
+El espesor es otro factor importante para cuando se tiene que fijar el modelo. No sirve modelar una placa espesa con elementos Mindlin. Sería mejor considerar elementos 3D dado que rápidamente se dispara el error para espesores relativamente pequeños(figura \ref{fig:espesorplacas}). Un espesor $\frac{t}{a}=0.07$ presenta un error relativo de 10\% para el problema estudiado .
+
+Las tensiones son de gran interés para cualquier aplicación de elementos placas. Como vemos en la figura \ref{fig:VM}, los dos casos estudiados presentan diferencias marcadas.  Para la placa empotrada tenemos una curvatura alta en los bordes y menos pronunciada en el centro. Como bien ya sabemos de las ecuaciones \eqref{eq:sigxplacas}, la tensión axíl va mano en mano con dicha curvatura $\frac{\partial^2 w}{\partial x^2}$ y $\frac{\partial^2 w}{\partial y^2}$. Cabe destacar que las mayores tensiones van a estar en los lados mas largos porque son los que precisan girar mayor cantidad en menos distancia para llegar al $w_{\max}$. 
+
+El caso de una placa simplemente apoyada es bien diferente. Al quedar con giro en sus bordes su mayor curvatura quedaría en el centro. Por ende, también estaría allí la mayor tensión axíl.
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=.9\textwidth]{fig/errvec.eps}
+	\caption{El error absoluto mejora con el aumento de elementos, desde siempre.}\label{fig:errorplacas}
+\end{figure}
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=.9\textwidth]{fig/time.eps}
+	\caption{El tiempo de cálculo de los elementos tratados. \textbf{Mayor es peor}. Los elementos Kirchoff integrados simbólicamente son los más pesados numéricamente.}
+	\label{fig:timeplacas}
+\end{figure}
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=.9\textwidth]{fig/espesor.eps}
+	\caption{Relación error relativo máximo vs. espesor para elementos Mindlin Q4. Note que es un gráfico adimensional.}
+	\label{fig:espesorplacas}
+\end{figure}
 
 
-\subsection{Resultados de estudio con placas planas}
-A raíz del cuadro \ref{tab:Convergencia} se puede inferir que los elementos Q8 son los mejores elementos para captar desplazamientos con un menor número de elementos. Tomando esto en cuenta y además que permiten una implementación isoparamétrica simple; se entiende por que las placas Kirchoff no aparecen en programas de elementos finitos.
-
-Los resultados indican que las placas Mindlin se comportan bien para espesores menores, efectivamente reduciendo el error relativo. Si se refina se obtienen mejores resultados.
-
-Las placas Kirchoff en cambio no exhiben mejora del error relativo con el cambio del espesor y convergen con poco refinamiento. Esto se debe a la libertad de deformación del elemento Kirchoff, permitiendo deformaciones del orden cubico para cada elemento.
-
-
-
-
- \begin{figure}[htb!]
+\begin{figure}[htb!]
  \centering
  \begin{subfigure}{0.49\textwidth}
  \includegraphics[width=\linewidth]{fig/VM.eps}
@@ -169,6 +213,7 @@ Las placas Kirchoff en cambio no exhiben mejora del error relativo con el cambio
  \label{fig:VM}
  \end{figure}
 
+\clearpage
 \section{Estudio de doble fondo de un buque}
 El buque a estudiar tendrá 5 metros de calado, dándonos una presión sobre el doble fondo de alrededor de $p=5 \si{\kilo \pascal}$. Esta va ser la presión nominal para la cual se va resolver el problema. Debido a la acción ondulatoria de las olas\footnote{Conocido como esfuerzos de quebranto.} el buque en realidad puede ser sometido a una presión aún mayor, por eso se va tomar un factor de seguridad $n=3$ para cuando se optimize. Se van a modelar 4 claras (distancia entre varengas) y una vagra. Las longitudinales van a ser perfiles bulbo $280\times13\si{\milli \meter}$, $300\times 13 \si{\milli \meter}$ para el fondo y el doble fondo, respectivamente. La distancia entre varengas es de $3,25\si{\meter}$ y la distancia entre vagras $4,4\si{\meter}$. Como no se dispones de perfiles bulbo en el programa a usar (NX 11.0 de Siemens) se utilizarán perfiles ``L"{} de características similares. Las dimensiones de los perfiles L se obtuvieron para que los momentos de Inercia $I_z$, $I_y$ sean lo más similares. Se utilizó WRESC\footnote{Whittingslow's Rapid Empirical Section Correlation for bulb-L.} para obtener el perfil adecuado para cada bulbo:
 

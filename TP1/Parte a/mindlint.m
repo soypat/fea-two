@@ -1,12 +1,15 @@
+N=100;
+a=1.4;
+t1= a/300;
+t2 = a;
+TITER4= t1:(t2-t1)/N:t2;
 
-
-DIVITER4 = ceil(1.2.^(1:22))+1
-
-errvec4 = zeros(length(DIVITER4),1);
+errvec4 = zeros(length(TITER4),1);
 Nelec4 = errvec4;
 timer4 = Nelec4;
 iter = 0;
-for divy = DIVITER4
+for t = TITER4
+    divy=11;
     iter = iter+1;
     tic
 % divisionesx = 11; % Minimo 3 divisiones
@@ -48,7 +51,7 @@ end
 %% Propiedades Material
 E = 210e9; %GPa Aluminio
 NU = 0.3;
-t = a/100; % a mm
+% t = a/100; % a mm
 
 F = E*t^3/(12*(1 - NU^2)); %Rigidez ante la flexion
 G = E/(2+2*NU); % Rigidez a la torsion
@@ -165,13 +168,13 @@ Dz=reshape(Dz,[],1)';
 % hold on
 wmax = abs(w_max(a,b,13,p0,F));
 Dmax=max(abs(Dz));
-errvec4(iter) = abs(wmax-Dmax);
+errvec4(iter) = 100*abs(wmax-Dmax)/wmax;
 Nelec4(iter)=Nelem;
 end
-semilogx(Nelec4,errvec4)
-title('Convergencia de solución')
-ylabel('Error absoluto máximo [mm]')
-xlabel('Numero de Elementos')
+plot(TITER4/a,errvec4)
+title('Efecto de espesor sobre solución (Q4)')
+ylabel('Error relativo [%]')
+xlabel('Razón de espesor a problema (t/a)')
 
 
 % figure 

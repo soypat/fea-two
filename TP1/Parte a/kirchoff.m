@@ -1,9 +1,31 @@
 %Placa Kirchoff
 
 %% Problema - nodos/elementos
+DIVITERk = ceil(1.2.^(1:14))+1
 
-divisionesx = 11;
-divisionesy = 7;
+errveck = nan(length(DIVITERk),1);
+Neleck = errveck;
+timerk = Neleck;
+iter = 1;
+for divy = DIVITERk(2:end)
+    
+    iter = iter+1;
+    tic
+% divisionesx = 11; % Minimo 3 divisiones
+% funcFormaMind8
+if divy == DIVITERk(iter-1)
+    continue
+end
+if mod(divy,2)==0
+    divy=divy+1;
+
+end
+divisionesx = ceil(divy*1.4);
+if mod(divisionesx,2)==0
+    divisionesx=divisionesx+1;
+end
+% divisionesx = 11;
+divisionesy = divy;
 a=1.4;b=1; % Tamaño del problema
 dx = a/(divisionesx-1);
 dy = b/(divisionesy-1);
@@ -33,7 +55,7 @@ isFixed = false(dof,1);
 % simplementeApoyadoNodos = [1 2 3 4 5 10 15 20 25 24 23 22 21 16 11 6]';
 for n =1:Nnod
     if nodos(n,1)==0 || nodos(n,2)==0 || nodos(n,2)==b || nodos(n,1)==a
-        isFixed(n2d(n))=[true true true];
+        isFixed(n2d(n))=[true false false];
     end
 end
 isFree = ~isFixed;
@@ -60,7 +82,7 @@ Ke = double(int(int(B'*C*B,x,[-dx dx]),y,[-dy dy]));
 % dNxy = jac\Nder;   % dNxy = inv(jac)*dN   
 for e = 1:Nelem
     storeTo = elemDof(e,:);
-    
+    Ke = double(int(int(B'*C*B,x,[-dx dx]),y,[-dy dy]));
 %     storeTo(elemDof(e,:)) = true;
     Kg(storeTo,storeTo) = Kg(storeTo,storeTo) + Ke;
 end
@@ -78,11 +100,25 @@ end
 
 %% Inversion (Cálculo de desplazamientos)
 Dr = Kg(isFree,isFree)\R(isFree);
-
+timerk(iter)=toc;
 
 D=zeros(dof,1);
 D(isFree) = Dr;
 
+errveck(iter)=max(max(abs(D_err)));
+% err =max(max(abs(D_err)));
+% scatter(divy,err)
+% hold on
+% clear
+Neleck(iter)=Nelem;
+
+end
+semilogx(Neleck,errveck)
+title('Convergencia de solución')
+ylabel('Error absoluto máximo [mm]')
+xlabel('Numero de Elementos')
+
+return
 W = D(1:3:end);
 fprintf("w_max = %f",max(abs(W)))
 W_analytic = zeros(Nnod,1);

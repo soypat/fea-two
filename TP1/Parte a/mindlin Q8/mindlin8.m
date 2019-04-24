@@ -2,17 +2,29 @@
 
 %% Problema - nodos/elementos
 % exp()
-DIVITER = 2.^(1:8)+1;
-errvec = zeros(length(DIVITER),1);
-iter = 0;
-for divy = DIVITER
+% DIVITER = 2.^(1:5)+1;
+DIVITER8 = ceil(1.2.^(1:16))+1
+
+errvec8 = nan(length(DIVITER8),1);
+timer8 = nan(length(DIVITER8),1);
+Nelec8 = errvec8;
+iter = 1;
+for divy = DIVITER8(2:end)
+    tic
     iter = iter+1;
 % divisionesx = 11; % Minimo 3 divisiones
 funcFormaMind8
+
+
+if mod(divy,2)==0
+    divy=divy+1;
+end
 divisionesx = ceil(divy*1.4);
 if mod(divisionesx,2)==0
     divisionesx=divisionesx+1;
 end
+
+
 divx=divisionesx;
 % divisionesy = 7; % Minimo 3 divisiones
 % divy=divisionesy;
@@ -51,7 +63,7 @@ Cb =   [F NU*F 0;
     NU*F F 0 
     0 0 (1-NU)*F/2];
 Cs = 5/6*[G*t 0;0 G*t];
-C = blkdiag(Cb,Cs);
+C = -blkdiag(Cb,Cs);
 
 %% Gauss  2x2      
 k   = 1/sqrt(3);
@@ -155,28 +167,34 @@ for e = 1:Nelem
 end
 %% Solucion
 Dr = Kg(isFree,isFree)\R(isFree);
-
+timer8(iter)=toc;
 
 D=zeros(dof,1);
 D(isFree) = Dr;
 W = D(1:3:end);
-fprintf("w_max=%f",max(abs(W)))
-W_analytic = zeros(Nnod,1);
+% fprintf("w_max=%f",max(abs(W)))
+% W_analytic = zeros(Nnod,1);
 D_err = nan(Nnod,1);
-N=9; %Iteraciones de sol analitica 9 es buen número, converge bastante bien
-for n = 1:Nnod
-    W_analytic(n) = w_analytic(nodos(n,1),nodos(n,2),a,b,N,p0,F);
-    if ~(nodos(n,2)==0 || nodos(n,2)==b ||nodos(n,1)==0 ||nodos(n,1)==a)
-        D_err(n) =  W_analytic(n) - W(n);
-    end
-end
-errvec(iter)=max(max(abs(D_err)));
+% for n = 1:Nnod
+%     W_analytic(n) = w_analytic(nodos(n,1),nodos(n,2),a,b,N,p0,F);
+%     if ~(nodos(n,2)==0 || nodos(n,2)==b ||nodos(n,1)==0 ||nodos(n,1)==a)
+%         D_err(n) =  W_analytic(n) - W(n);
+%     end
+% end
+dmax = max( abs(D));
+wmax = abs(w_max(a,b,13,p0,F));
+errvec8(iter)= abs(dmax-wmax);
 % err =max(max(abs(D_err)));
 % scatter(divy,err)
 % hold on
 % clear
+Nelec8(iter)=Nelem;
+
 end
-plot(DIVITER,errvec)
+semilogx(Nelec8,errvec8)
+title('Convergencia de solución')
+ylabel('Error absoluto máximo [mm]')
+xlabel('Numero de Elementos')
 
 return
 
