@@ -22,8 +22,8 @@
 *.out
 *.gz
 *.toc
-
-
+# a/**/b" matches "a/b", "a/x/b", "a/x/y/b
+**/fig/**.pdf #Those pesky pdf duplicates of my figures
 
 
 # GO STUFF
