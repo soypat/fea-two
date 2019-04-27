@@ -1,28 +1,39 @@
 \documentclass[onecolumn,10pt,titlepage]{article}
 \usepackage[a4paper,top=2.5cm,bottom=2cm,left=2cm,right=2cm,marginparwidth=1.75cm,headheight=28pt]{geometry}
+% Formateo para castellano
 \usepackage[utf8]{inputenc}
-\usepackage[spanish,mexico]{babel} 
+\usepackage[spanish,mexico]{babel}
+
+%Bibliografía
 \usepackage{natbib}
+% Simbolos para notas de pie
 \usepackage[symbol]{footmisc}
 \renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
 % \renewcommand{\thefootnote}{\fnsymbol{footnote}}
 % \footnote[num]{text}
 
 % \pagestyle{myheading}
 % \markright{Mi Documento \hfill Mi nombre \hfi}
+%
 \usepackage{fancyhdr,framed}
 \setlength{\headheight}{15.2pt}
 \pagestyle{fancy}
 \lhead{Elementos Finitos II - 31.92 \\ Patricio Whittingslow -- 55423}
 \chead{TP 1}
 
-\usepackage{caption}
-\usepackage{subcaption}
+
+%\usepackage{subcaption}
+
+% Para el entorno align
 \usepackage{amsmath}
 
+% Multiples columnas para glosario
 \usepackage{multicol}
-%\usepackage{mathastext} %BORRAR O DEJAR: Cambia estilo de la fuente matemática y la deja con aspecto mas "técnico".
+
+%Figuras y subtitulos
 \usepackage{graphicx}
+\usepackage{caption,subcaption}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
@@ -42,18 +53,19 @@
 
 
 
-%\usepackage{siunitx}
+\usepackage{siunitx}
 \newcommand{\glossentry}[2]{$#1$ \indent #2 \par \vspace{.4cm} }
 \newcommand{\adm}{\textrm{adm}}
-\newcommand{\unit}[1]{\textsf{#1}}
-\newcommand{\mega}{\unit{M}}
-\newcommand{\milli}{\unit{m}}
-\newcommand{\giga}{\unit{G}}
-\newcommand{\meter}{\unit{m}}
-\newcommand{\pascal}{\unit{Pa}}
-\newcommand{\kilo}{\unit{k}}
-\newcommand{\si}[1]{#1}
-\newcommand{\SI}[2]{#1\si{#2}}
+
+%\newcommand{\unit}[1]{\textsf{#1}}
+%\newcommand{\mega}{\unit{M}}
+%\newcommand{\milli}{\unit{m}}
+%\newcommand{\giga}{\unit{G}}
+%\newcommand{\meter}{\unit{m}}
+%\newcommand{\pascal}{\unit{Pa}}
+%\newcommand{\kilo}{\unit{k}}
+%\newcommand{\si}[1]{#1}
+%\newcommand{\SI}[2]{#1\si{#2}}
 \title{Informe Técnico - ITBA}
 
 \author{Patricio Whittingslow}
@@ -82,7 +94,7 @@
 	\vspace{3cm}
 	\begin{figure}[htb!]
 		\centering
-		\includegraphics[width=6cm]{logoitba.png}
+		\includegraphics[draft,width=6cm]{logoitba.png}
 	\end{figure}
 \end{titlepage}
 
@@ -135,7 +147,7 @@ donde $F=\frac{E t^{3}}{12\left(1-\nu^{2}\right)}$ es la rigidez ante la flexió
 Las placas analizadas son Kirchoff, Mindlin Q4 y Mindlin Q8.
 
 \subsection{Método}
-El problema trata una placa de espesor $t$ con dimensiones $a\times b$ donde $a=1,4\si{\meter}$ y $b=1\si{\meter}$. El material es acero\footnote{$E=\SI{210}{\giga \pascal}$ y $\nu=0,3$}. Los casos son con presión uniforme $p$ para los espesores $t=a$, $t=\frac{a}{10}$ y $t=\frac{a}{100}$. El factor de corrección para tensión por corte transverso es igual a $k=\frac{5}{6}$ usando integración selecta\citep{cook2007concepts} para placas Mindlin . 
+El problema trata una placa de espesor $t$ con dimensiones $a\times b$ donde $a=1,4\si{\meter}$ y $b=1\si{\meter}$. El material es acero\footnote{$E=\SI{210}{\giga \pascal}$ y $\nu=0,3$}. Los casos son con presión uniforme $p$ para los espesores $t=a$, $t=\frac{a}{10}$ y $t=\frac{a}{100}$. El factor de corrección para tensión por corte transverso es igual a $k=\frac{5}{6}$ usando integración selecta\citep{cook2007concepts} para placas Mindlin.
 
 Se tiene que para una placa simplemente apoyada con carga uniforme el desplazamiento máximo esta dada por \citep{ugural2003advanced}
 \begin{equation}\label{eq:uguralwmax}
@@ -216,7 +228,7 @@ El caso de una placa simplemente apoyada es bien diferente. Al quedar con giro e
 
 \clearpage
 \section{Estudio de doble fondo de un buque}
-El buque a estudiar tendrá 5 metros de calado, dándonos una presión sobre el doble fondo de alrededor de $p=5 \si{\kilo \pascal}$. Esta va ser la presión nominal para la cual se va resolver el problema. Debido a la acción ondulatoria de las olas\footnote{Conocido como esfuerzos de quebranto/arrufo.} el buque en realidad puede ser sometido a una presión aún mayor, por eso se va tomar un factor de seguridad $n=3$ para optimizar. Se van a modelar 4 claras (distancia entre varengas) y una vagra. Las longitudinales van a ser perfiles bulbo $280\times13\si{\milli \meter}$, $300\times 13 \si{\milli \meter}$ para el fondo y el doble fondo, respectivamente. La distancia entre varengas es de $3,25\si{\meter}$ y la distancia entre vagras $4,4\si{\meter}$. Como no se dispones de perfiles bulbo en el programa a usar (NX 11.0 de Siemens) se utilizarán perfiles ``L"{} de características similares. Las dimensiones de los perfiles L se obtuvieron para que los momentos de Inercia $I_z$, $I_y$ sean lo más similares. 
+El buque a estudiar tendrá 5 metros de calado, dándonos una presión sobre el doble fondo de alrededor de $p=5 \si{\kilo \pascal}$. Esta va ser la presión nominal para la cual se va resolver el problema.  El modelo tiene una dimensión longitudinal de 4 claras (distancia entre varengas) y dimensión transversal de una vagra (figura \ref{fig:modeloPlanta}). Las longitudinales van a ser perfiles bulbo $280\times13\si{\milli \meter}$, $300\times 13 \si{\milli \meter}$ para el fondo y el doble fondo, respectivamente. La distancia entre varengas es de $3,25\si{\meter}$ y la distancia entre vagras $4,4\si{\meter}$. Como no se dispones de perfiles bulbo en el programa a usar (NX 11.0 de Siemens) se utilizarán perfiles ``L"{} de características similares. Las dimensiones de los perfiles L se obtuvieron para que los momentos de Inercia $I_z$, $I_y$ sean lo más similares. 
 
 
 \subsection{Método}
@@ -225,15 +237,15 @@ La cátedra de la materia sugiere un modelo diferente al tratado. Sugería model
 
 \begin{figure}[htb!]
 	\centering
-	\includegraphics[width=.5\textwidth]{fig/modelocatedra.png}
-	\caption{Modelo dado en el enunciado del TP. \textbf{No fue resuelto.} Apoyo simple sobre el plano B, simetría sobre A (ambas son vagras). Apoyos simples sobre varengas.}
+	\includegraphics[draft,width=.5\textwidth]{fig/modelocatedra.png}
+	\caption{Modelo dado en el enunciado del TP. \textbf{No es el modelo resuelto.} Apoyo simple sobre el plano B, simetría sobre A (ambas son vagras). Apoyos simples sobre varengas.}
 	\label{fig:modelocatedra}
 \end{figure}
 El autor optó por adaptar el modelo comenzando por la normalización de las dimensiones. La figura \ref{fig:modeloTransversal} muestra el corte transversal del modelo tratado. Las condiciones de borde que antes se ubicaban sobre las vagras ahora están en el espacio entre vagras. Esto no debería considerarse más que un cambio estético, ya que matemáticamente ambas estructuras son equivalentes si se emplea la simetría de forma correcta.
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=0.7\linewidth]{fig/MODELO.eps}
-	\caption{Corte transversal del modelo. La placa superior es el fondo y por el medio queda la vagra. La profundidad (longitud) del modelo es de \SI{16,25}{\meter}.}
+	\caption{Corte transversal del modelo. La placa superior es el fondo y por el medio queda la vagra. Dimensión longitudinal del modelo es \SI{13,0}{\meter}.}
 	\label{fig:modeloTransversal}
 \end{figure}
 
@@ -246,7 +258,7 @@ La interpretación más lógica del segundo inciso es modelar la estructura con 
 
 El autor entonces modifica el modelo, otra vez cambiando los límites de la estructura propuesta. Los límites transversales ahora se encuentran sobre la linea media entre dos varengas. Estas modificaciones permiten ver dentro del modelo cuando se obtiene una solución, dando paso a la rápida iteración de secciones. También se presta a menor confusión al momento del mallado al otorgar espesor a las varengas/vagras, pues no hay que dividir ningún espesor de placa por dos \citep{cook2007concepts} puesto que no hay planos de simetría que cortan nuestras placas.
 
-Se reitera que los dos modelos son validos, y equivalentes. En este trabajo práctico se va tratar solo \textbf{uno.}
+Se reitera que las dos estructuras son equivalentes. En este trabajo práctico se va tratar solo \textbf{una.}
 
 \subsubsection*{Condiciones de Borde} 
 
@@ -255,7 +267,8 @@ Se planteo un modelo aprovechando el eje longitudinal simétrico y considerando 
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=.6\textwidth]{fig/modelnx.eps}
-	\caption{Modelo elegido. Linea punteada representa condiciones de borde de simetría según \citep{cook2007concepts}. Linea solida representa condición de borde especial, idéntica a la simetría con soporte agregado en $z$ (saliente a la hoja).}
+	\caption{Vista en planta del modelo trabajado. Linea punteada representa condiciones de borde de simetría según \citep{cook2007concepts}. Linea solida representa condición de borde especial, idéntica a la simetría con soporte agregado en $z$ (saliente a la hoja).}
+	\label{fig:modeloPlanta}
 \end{figure}
 
 
@@ -263,6 +276,8 @@ La simetría es aplicada de forma que se vean esfuerzos generados por el equilib
 
 
 \subsection{Resultados y optimización}
+Debido a la acción ondulatoria de las olas\footnote{Conocido como esfuerzos de quebranto/arrufo.} el buque en realidad puede ser sometido a una presión aún mayor, por eso se va tomar un factor de seguridad $n=3$ para optimizar.
+
 Como se puede ver, los esfuerzos se regularizan al acercarse al borde transversal sin soporte en $z$, lo cual nos da una idea que la situación vista en la figura \ref{fig:2a} podría estar ocurriendo en el interior de un buque. Lo que puede llegar a llamar la atención es que las tensiones son relativamente bajas en los longitudinales.
 
 
@@ -271,7 +286,7 @@ Como se puede ver, los esfuerzos se regularizan al acercarse al borde transversa
  \begin{subfigure}{0.49\textwidth}
  % \begingroup
  \begin{framed}
- \includegraphics[height=3.3cm]{fig/longitudinales_a.png}
+ \includegraphics[height=3.3cm,draft]{fig/longitudinales_a.png}
  \caption{Vista de los elementos viga. Perfiles superiores son los $280\times 13\si{\milli \meter}$. $\sigma_{vm_{\max}}= 64,09 $\si{\mega \pascal}.}
  \label{fig:longitudinalesCasoA}
  \end{framed}
@@ -279,7 +294,7 @@ Como se puede ver, los esfuerzos se regularizan al acercarse al borde transversa
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
  \begin{framed}
- \includegraphics[height=3.3cm]{fig/varengas_a.png}
+ \includegraphics[height=3.3cm,draft]{fig/varengas_a.png}
  \caption{Vista de los elementos cascaras del doble fondo. $\sigma_{vm_{\max}}= 112,67 $\si{\mega \pascal}.}
  \label{fig:VarengasCasoA}
  \end{framed}
@@ -305,7 +320,7 @@ En la figura \ref{fig:optimizacion} se puede observar que las secciones quedaron
 
  \begin{figure}
      \centering
-     \includegraphics[width=11cm]{fig/VoptiSIM.png}
+     \includegraphics[draft,width=11cm]{fig/VoptiSIM.png}
      \caption{Tensiones son las de Von Mises del resultado final de la optimización.}
      \label{fig:optimizacion}
  \end{figure}
@@ -314,29 +329,47 @@ En la figura \ref{fig:optimizacion} se puede observar que las secciones quedaron
 H. A. Schade ha publicado una serie de curvas indicativas de desplazamiento bajo carga uniforme en función de varios parámetros para placas reforzadas.
 \begin{figure}[htb!]
 	\centering
-	\includegraphics[width=.7\textwidth]{fig/placaschade.png}
-	
+	\includegraphics[draft,width=.7\textwidth]{fig/placaschade.png}
+	\caption{Largo de placa longitudinal $a=\SI{4400}{\milli \meter}$. Ancho de placa transversal $b=\SI{3250}{\milli\meter}$. Espesor de placa doble fondo $t=7\si{\milli \meter}$.}
 	\label{fig:placaschade}
 \end{figure}
 
-Se calcula todos los parámetros para el doble fondo optimizado, cuyo desplazamiento máximo para el estado de cargas resultó ser \SI{9,205}{\milli \meter}. como no se tienen transversales, $i_b=0$.
+%Se calcula todos los parámetros para el doble fondo optimizado, cuyo desplazamiento máximo para el estado de cargas resultó ser \SI{9,205}{\milli \meter}. 
+Como no se tienen transversales: $I_{\mathrm{nb}}=I_{\mathrm{n}}=i_b=0$. $i_a$ es la rigidez unitaria longitudinal.
 \[
 i_{a}=\frac{I_{n a}}{s_{a}}+2\left(\frac{I_{a}-I_{n a}}{b}\right)=703,4\si{\milli \meter^3}
 \]
-donde $I_{na}=I_{a}=\SI{457200}{\milli \meter }^4$ y $b$ es la distancia entre vagras, \SI{4400}{\milli \meter}. $s_a=\SI{650}{\milli \meter}$.
+donde $I_{na}=I_{a}=\SI{457200}{\milli \meter }^4$ y $b$ es la distancia entre vagras, \SI{4400}{\milli \meter}. $s_a=\SI{650}{\milli \meter}$ es la distancia entre longitudinales.
 
+
+Los valores  $I_{\mathrm{pa}}$ y $I_{\mathrm{pb}}$ son los momentos de inercia del doble fondo longitudinal y transversal, respectivamente. Toma el ancho efectivo como la mitad del espaciamiento entre longitudinales. Como no hay transversales se toma el ancho efectivo siendo la mitad de distancia entre varengas $b$. 
 \[
-\eta=\sqrt{\frac{\mathrm{I}_{\mathrm{pa}}}{\mathrm{I}_{\mathrm{na}}} \cdot \frac{\mathrm{I}_{\mathrm{pb}}}{\mathrm{I}_{\mathrm{nb}}}} = 
+I_{\mathrm{pb}}= \frac{t^3 b/2}{12} = \SI{4,65e4}{\milli \meter^4}
+\qquad\quad I_{\mathrm{pa}}= \SI{9,29e3}{\milli\meter^4}
 \]
 
+Estos valores se usan para calcular el coeficiente de torsión $\eta$ y la relación virtual de los lados del panel $\rho$, calculo que resulta trivial para justo este ejemplo donde no se tiene transversales.
 
 \[
-\rho=\frac{a}{b} \sqrt{\frac{i_{b}}{i_{a}}}
+\rho=\frac{a}{b} \sqrt[4]{\frac{i_{b}}{i_{a}}}= 0
+\]
+\[
+\eta=\sqrt{\frac{\mathrm{I}_{\mathrm{pa}}}{\mathrm{I}_{\mathrm{na}}} \cdot \frac{\mathrm{I}_{\mathrm{pb}}}{\mathrm{I}_{\mathrm{nb}}}} = \infty
 \]
 
+Procedemos a buscar el valor de $K$ en las curvas de Schade. Los valores de tabla para esfuerzos longitudinales y transversales en el centro de la \textbf{placa empotrada en dos lados opuestos y simplemente apoyada en sus dos lados restantes} de material con modulo Poisson $0,3$, resultan ser
 \[
-\eta=0,124 \sqrt{\frac{\mathrm{I}^{2}_\mathrm{pb}}{\mathrm{I}_{\mathrm{a}} \mathrm{I}_{\mathrm{nb}}} \frac{b}{s_{\mathrm{b}}}}
+K_{\textrm{transversal}}=  \qquad K_{\textrm{longitudinal}}=
+\] 
+
+Por ultimo queda calcular las tensiones usando la formula
+
+\[
+\sigma_{\textrm{transversal}}= K \cdot \frac{\rho b^2y_b }{i_b} \, , \qquad \sigma_{\textrm{longitudinal}}= K \cdot \frac{\rho b^2y_a }{\sqrt{i_a i_b}}
 \]
+%\[
+%\eta=0,124 \sqrt{\frac{\mathrm{I}^{2}_\mathrm{pb}}{\mathrm{I}_{\mathrm{a}} \mathrm{I}_{\mathrm{nb}}} \frac{b}{s_{\mathrm{b}}}}
+%\]
 
 
 
@@ -350,9 +383,9 @@ donde $I_{na}=I_{a}=\SI{457200}{\milli \meter }^4$ y $b$ es la distancia entre v
 
 
 \section{Conclusión}
-Terminado el proceso de optimización, queda el trabajo de contrastarlo con resultados de la realidad o con bilbiografía. Se invitan futuros ingenieros a comparar los resultados obtenidos con las curvas de Schade\citep{dominguez1969calculo}. Se puede también continuar el trabajo de reafinar las secciones de las longitudinales pues no dejan de estar sobredimensionadas, incluso después de optimización. 
+Terminado el proceso de optimización, queda el trabajo de contrastarlo con resultados de la realidad o con bibliografía. Se invitan futuros ingenieros a comparar los resultados obtenidos con las curvas de Schade\citep{dominguez1969calculo}. Se puede también continuar el trabajo de refinar las secciones de las longitudinales pues no dejan de estar sobredimensionadas, incluso después de optimización. 
 
-Con esto dicho, el resultado predispone de buenas caracteristicas. Se pueden observar campos de tensiones en el doble fondo (figura \ref{fig:optimizacion}) similares a la de una placa empotrada (figura \ref{fig:VMempotrado}). Se tiene también un pequeño relieve de tensiones en su cara central. Esto se debe a que los longitudinales aportan un pequeño giro a la placa al deformarse. Se tiene entonces una superposición con el caso mencionado anteriormente, y el estado de tensiones de una placa simplemente apoyada (figura \ref{fig:VMapoyado}).
+Con esto dicho, el resultado predispone de buenas características. Se pueden observar campos de tensiones en el doble fondo (figura \ref{fig:optimizacion}) similares a la de una placa empotrada (figura \ref{fig:VMempotrado}). Se tiene también un pequeño relieve de tensiones en su cara central. Esto se debe a que los longitudinales aportan un pequeño giro a la placa al deformarse. Se tiene entonces una superposición con el caso mencionado anteriormente, y el estado de tensiones de una placa simplemente apoyada (figura \ref{fig:VMapoyado}).
 
 En conclusión, un estudio preliminar básico puede ayudar inmensamente llegado al final de un informe, como hemos visto. Se ahorró la necesidad de comparar resultados gracias a la semejanza de placas planas con cascaras.
 
