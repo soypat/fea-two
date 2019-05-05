@@ -278,8 +278,11 @@ La simetría es aplicada de forma que se vean esfuerzos generados por el equilib
 \subsection{Resultados y optimización}
 Debido a la acción ondulatoria de las olas\footnote{Conocido como esfuerzos de quebranto/arrufo.} el buque en realidad puede ser sometido a una presión aún mayor, por eso se va tomar un factor de seguridad $n=3$ para optimizar.
 
-Como se puede ver, los esfuerzos se regularizan al acercarse al borde transversal sin soporte en $z$, lo cual nos da una idea que la situación vista en la figura \ref{fig:2a} podría estar ocurriendo en el interior de un buque. Lo que puede llegar a llamar la atención es que las tensiones son relativamente bajas en los longitudinales.
+La gran ventaja del método elementos finitos es el rápido prototipado y obtención de resultados. En meros minutos de modificar las dimensiones del sistema en cuestión el usuario se puede hacer una idea de la relación entre dimensiones y tensiones.
 
+Para el sistema en cuestión se observó que el espesor de vagra del modelo no era determinante para las tensiones globales. En cambio modificar las varengas tiene un efecto amplio ya que no reparten la carga con otros refuerzos como la vagra, así afectando las tensiones del resto del problema. Con esto en mente no es sorpresa porque las vagras mantuvieron su espesor inicial llegado el final de la optimización.
+
+Como se puede ver, los esfuerzos se regularizan al acercarse al borde transversal sin soporte en $z$, lo cual nos da una idea que la situación vista en la figura \ref{fig:2a} podría estar ocurriendo en el interior de un buque. Lo que puede llegar a llamar la atención es que las tensiones son relativamente bajas en los longitudinales.
 
  \begin{figure}[htb!]
  \centering
@@ -326,70 +329,69 @@ En la figura \ref{fig:optimizacion} se puede observar que las secciones quedaron
  \end{figure}
 
 \subsubsection*{Curvas de Schade}
-H. A. Schade ha publicado una serie de curvas indicativas de desplazamiento bajo carga uniforme en función de varios parámetros para placas reforzadas.
+H. A. Schade ha publicado una serie de curvas indicativas de desplazamiento bajo carga uniforme en función de varios parámetros para placas reforzadas. Por la simetrías usadas se duplican las dimensiones.
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[draft,width=.7\textwidth]{fig/placaschade.png}
-	\caption{Largo de placa longitudinal $a=\SI{4400}{\milli \meter}$. Ancho de placa transversal $b=\SI{3250}{\milli\meter}$. Espesor de placa doble fondo $t=7\si{\milli \meter}$.}
+	\caption{Largo de placa longitudinal $a=\SI{26000}{\milli \meter}$. Ancho de placa transversal $b=\SI{8800}{\milli\meter}$. Espesor de placa doble fondo $t=7\si{\milli \meter}$.}
 	\label{fig:placaschade}
 \end{figure}
 
-%Se calcula todos los parámetros para el doble fondo optimizado, cuyo desplazamiento máximo para el estado de cargas resultó ser \SI{9,205}{\milli \meter}. 
-Como no se tienen transversales: $I_{\mathrm{nb}}=I_{\mathrm{n}}=i_b=0$. $i_a$ es la rigidez unitaria longitudinal.
+Se va plantear el siguiente esquema para llegar a un número que se aproxime al resultado obtenido.
+\begin{itemize}
+	\item $I_{varenga}= \SI{1,267e9}{\milli \meter^4}$
+	\item $I_{vagra}=\SI{6,336e9}{\milli \meter ^4}$
+	\item $I_{bulbo}=\SI{4,572e5}{\milli \meter ^4}$
+	\item $I_{\mathrm{pb}}= \frac{t^3 s_b}{12}=\SI{9,29e4}{\milli \meter^4} $
+	\item $I_{\mathrm{pa}}= \frac{t^3 s_a}{12}=\SI{1,86e4}{\milli \meter^4} $
+\end{itemize}
+donde $s$ es la separación entre refuerzos. $s_b=3250\si{\milli \meter}$ y $s_a=650\si{\milli \meter}$ correspondiente a la distancia entre varengas. Por como se entiende las definiciones de \cite{dominguez1969calculo}:
 \[
-i_{a}=\frac{I_{n a}}{s_{a}}+2\left(\frac{I_{a}-I_{n a}}{b}\right)=703,4\si{\milli \meter^3}
+I_{\mathrm{b}}=I_{\mathrm{pb}}+I_{varenga}=\SI{1,267e9}{\milli \meter ^4}, \qquad I_{\mathrm{a}}=I_{\mathrm{pa}}+I_{vagra}=\SI{6,336e9}{\milli \meter ^4}
 \]
-donde $I_{na}=I_{a}=\SI{457200}{\milli \meter }^4$ y $b$ es la distancia entre vagras, \SI{4400}{\milli \meter}. $s_a=\SI{650}{\milli \meter}$ es la distancia entre longitudinales.
+\[
+I_{\mathrm{nb}}=I_{\mathrm{pb}}+I_{varenga}=\SI{1,267e9}{\milli \meter ^4}, \qquad I_{\mathrm{na}}=I_{\mathrm{pa}}+I_{bulbo}=\SI{4,643e5}{\milli \meter ^4}
+\]
 
 
-Los valores  $I_{\mathrm{pa}}$ y $I_{\mathrm{pb}}$ son los momentos de inercia del doble fondo longitudinal y transversal, respectivamente. Toma el ancho efectivo como la mitad del espaciamiento entre longitudinales. Como no hay transversales se toma el ancho efectivo siendo la mitad de distancia entre varengas $b$. 
 \[
-I_{\mathrm{pb}}= \frac{t^3 b/2}{12} = \SI{4,65e4}{\milli \meter^4}
-\qquad\quad I_{\mathrm{pa}}= \SI{9,29e3}{\milli\meter^4}
+i_{a}=\frac{I_{\mathrm{n a}}}{s_{a}}+2\left(\frac{I_{\mathrm{a}}-I_{\mathrm{na}}}{b}\right)=\SI{2,88e6}{\milli \meter^3}, \qquad i_b = \frac{I_{\mathrm{n b}}}{s_{b}}+2\left(\frac{I_{\mathrm{b}}-I_{\mathrm{nb}}}{a}\right)=\SI{3,898e5}{\milli \meter^3}
 \]
+
+Los valores  $I_{\mathrm{pa}}$ y $I_{\mathrm{pb}}$ son los momentos de inercia del doble fondo longitudinal y transversal, respectivamente. Toma el ancho efectivo como la mitad del espaciamiento entre longitudinales.  
 
 Estos valores se usan para calcular el coeficiente de torsión $\eta$ y la relación virtual de los lados del panel $\rho$, calculo que resulta trivial para justo este ejemplo donde no se tiene transversales.
 
 \[
-\rho=\frac{a}{b} \sqrt[4]{\frac{i_{b}}{i_{a}}}= 0
+\rho=\frac{a}{b} \sqrt[4]{\frac{i_{b}}{i_{a}}}= 9.7
 \]
 \[
-\eta=\sqrt{\frac{\mathrm{I}_{\mathrm{pa}}}{\mathrm{I}_{\mathrm{na}}} \cdot \frac{\mathrm{I}_{\mathrm{pb}}}{\mathrm{I}_{\mathrm{nb}}}} = \infty
+\eta=\sqrt{\frac{\mathrm{I}_{\mathrm{pa}}}{\mathrm{I}_{\mathrm{na}}} \cdot \frac{\mathrm{I}_{\mathrm{pb}}}{\mathrm{I}_{\mathrm{nb}}}} = 5,4\times 10^{-4} \approx 0
 \]
 
-Procedemos a buscar el valor de $K$ en las curvas de Schade. Los valores de tabla para esfuerzos longitudinales y transversales en el centro de la \textbf{placa empotrada en dos lados opuestos y simplemente apoyada en sus dos lados restantes} de material con modulo Poisson $0,3$, resultan ser
+Procedemos a buscar el valor de $K$ en las curvas de Schade. Los valores de tabla para desplazamientos en el centro de la \textbf{placa simplemente apoyada} de material con modulo Poisson $0,3$, resultan ser
 \[
-K_{\textrm{transversal}}=  \qquad K_{\textrm{longitudinal}}=
+K_w=0,013  
 \] 
 
-Por ultimo queda calcular las tensiones usando la formula
+Por ultimo queda calcular el desplazamiento usando la igualdad teniendo en cuenta unidades en $\frac{\si{\newton}}{\si{\milli \meter}}$ y $\si{\milli \meter}$.
 
 \[
-\sigma_{\textrm{transversal}}= K \cdot \frac{\rho b^2y_b }{i_b} \, , \qquad \sigma_{\textrm{longitudinal}}= K \cdot \frac{\rho b^2y_a }{\sqrt{i_a i_b}}
+w = K_w \cdot \frac{ p b^4  }{E i_b} = \SI{4,88}{\milli \meter}
 \]
-%\[
-%\eta=0,124 \sqrt{\frac{\mathrm{I}^{2}_\mathrm{pb}}{\mathrm{I}_{\mathrm{a}} \mathrm{I}_{\mathrm{nb}}} \frac{b}{s_{\mathrm{b}}}}
-%\]
 
-
-
-
-
-
-
-
-
-
+El resultado de Schade no dá el desplazamiento máximo obtenido en la simulación de NX pero sí da muy parecido al desplazamiento sobre la mitad de la placa, sobre el \emph{refuerzo longitudinal central}.
 
 
 \section{Conclusión}
-Terminado el proceso de optimización, queda el trabajo de contrastarlo con resultados de la realidad o con bibliografía. Se invitan futuros ingenieros a comparar los resultados obtenidos con las curvas de Schade\citep{dominguez1969calculo}. Se puede también continuar el trabajo de refinar las secciones de las longitudinales pues no dejan de estar sobredimensionadas, incluso después de optimización. 
-
-Con esto dicho, el resultado predispone de buenas características. Se pueden observar campos de tensiones en el doble fondo (figura \ref{fig:optimizacion}) similares a la de una placa empotrada (figura \ref{fig:VMempotrado}). Se tiene también un pequeño relieve de tensiones en su cara central. Esto se debe a que los longitudinales aportan un pequeño giro a la placa al deformarse. Se tiene entonces una superposición con el caso mencionado anteriormente, y el estado de tensiones de una placa simplemente apoyada (figura \ref{fig:VMapoyado}).
-
-En conclusión, un estudio preliminar básico puede ayudar inmensamente llegado al final de un informe, como hemos visto. Se ahorró la necesidad de comparar resultados gracias a la semejanza de placas planas con cascaras.
+El resultado predispone de buenas características. Se pueden observar campos de tensiones en el doble fondo (figura \ref{fig:optimizacion}) similares a la de una placa empotrada (figura \ref{fig:VMempotrado}). Se tiene también un pequeño relieve de tensiones en su cara central. Esto se debe a que los longitudinales aportan un pequeño giro a la placa al deformarse. Se tiene entonces una superposición con el caso mencionado anteriormente, y el estado de tensiones de una placa simplemente apoyada (figura \ref{fig:VMapoyado}).
 
 
+Los resultados de la optimización indican que se puede ahorrar una gran cantidad de material. Si suponemos que el sistema tiene dimensiones proporcionales al buque estudiado entonces se ahorra un 34\% de material en planchas, sin considerar la reducción en tamaño de los perfiles bulbos. Mientras que el fondo y las vagras se redujeron en 50\% el doble fondo solo se redujo en 30\%. Esto se debe a que las deformaciones sobre el doble fondo son altas por la presión hidrostática. Agregar más hileras de longitudinales reduce este efecto. Se vuelve complejo optimizar el doble fondo agregando longitudinales y intentando de ahorrar costos. 
+
+Llegado al punto anterior la opción más práctica sería agregar transversales  y así reducir el material de las varengas, cuyo espesor se mantuvo igual durante la optimización por las razones mencionadas en la sección de optimización.
+
+Dicho esto último hay mucha libertad en como optimizar la estructura de doble fondo, libertades consideradas en software de cálculo de estructuras de buques y que exceden el alcance de este informe que fue hecho para la materia de grado Elementos Finitos II - 31.92 de el Instituto Tecnológico de Buenos Aires.
 
 \clearpage
 \bibliography{labibliografia} % Indica archivo
