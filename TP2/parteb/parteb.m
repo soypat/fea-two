@@ -22,10 +22,10 @@ b=20e-3; % 3cm
 h=10e-3; % 1cm
 % h=0.0005; %medio milimetro
 I=b*h^3/12;
-A=b*h;
+Amp=b*h;
 E=70e9; %Pa
 rho=2700;
-m = rho*A*Le;
+m = rho*Amp*Le;
 Me= m/420 * [156    22*Le     54      -13*Le
             22*Le    4*Le^2    13*Le    -3*Le^2
             54      13*Le     156     -22*Le
@@ -41,13 +41,9 @@ for e=1:Nelem
     Mg(storeTo,storeTo) = Mg(storeTo,storeTo) + Me;
 end
 
-% F = v sin wt
-
 
 isFixed = false(dof,1);
-isFixed([2]) = true; % Primer nodo se desplaza libremente en <y>
-isFixed([end-1]) = true; % Ultimo nodo apoyado simplemente
-% isFixed(1:2:end) = true; %fijamos todos los nodos en X para matar modo axial
+isFixed([1 2]) = true; % Primer nodo empotrado
 isFree = ~isFixed;
 A = Mg(isFree,isFree)\Kg(isFree,isFree); %F de frecuencia
 
@@ -97,35 +93,46 @@ omega2 = sqrt(diag(ESP)); % y una cuarta para que tengas
 %[omegaray ray omega omega2] %Descomentar para ver que son identicas
 
 %% Cargas Externas / cargas modales (P y Rmodal [son lo mismo])
-Rext = false(dofred,1); % (11.7-5) cook
-for i=1:2:size(Mg(isFree,isFree)) % los dof en y los sacudo
-    Rext(i,1) = true;
+input_omega = 1:1:10000;
+Nfrec = length(input_omega);
+
+acel = @(x,A,omega) A.*sin(omega.*x);
+Rext = zeros(dof,1); % (11.7-5) cook
+Rmodalenfrecuencia = zeros(dofred,Nfrec); % (11.7-5) cook
+for f =1:Nfrec
+    for i=1:2:dof % los dof en y los sacudo
+        n=round((i+1)/2);
+        x = nodos(n,1);
+        Rext(i) = 1;%;acel(x,1,input_omega(f));
+%         if abs(x-L)<1e-4
+%             Rext(i) = 1;%acel(x,1,input_omega(f));
+%         end
+    end
+    Rextred = Rext(isFree);
+    Rmodalenfrecuencia(:,f) = -Phi'* Mg(isFree,isFree)*Rextred;
 end
-Rext= - Mg(isFree,isFree)*Rext;
-Rmodal = Phi' *Rext;  %Cada modo se lleva una carga. asi funciona esta wea
+% Rext= - Mg(isFree,isFree)*Rext;
+% Rmodal = Phi' *Rext;  %Cada modo se lleva una carga. asi funciona esta wea
 % OTRA FORMA:
-P = zeros(dofred,1);
-for i=1:dofred
-    Phii = Phi(:,i);% Ecuacion (11.7-6) cook
-    P(i)=Phii' * Rext; % Es lo mismo que Rmodal == P 
-end
+
 %Comienza la magia negra
-input_omega = 1:1:10000;  % sine sweep dominio frecuencias
+  % sine sweep dominio frecuencias
 input_ksi = 0.02:.05:.2; %damping
 Nksi = length(input_ksi);
-Nfrec = length(input_omega);
-A = zeros(Nfrec,Nksi);
+
+Amp = zeros(Nfrec,Nksi);
 
 for k = 1:Nksi
     for f = 1:Nfrec
         z=zeros(dofred,1);
         for i=1:dofred
+            x = floor( (i+2)/2 );
             beta = input_omega(f)/omega(i);
-            z(i) = (Rmodal(i)/omega(i)^2)/sqrt((1-beta^2)^2+(2*input_ksi(k)*beta)^2);
+            z(i) = (Rmodalenfrecuencia(i,f)/omega(i)^2)/sqrt((1-beta^2)^2+(2*input_ksi(k)*beta)^2);
         end
-        A(f,k) = abs(sum(z));% tomo valor absoluto para que me quede lindo
+        Amp(f,k) = abs(sum(z));% tomo valor absoluto para que me quede lindo
     end
-    semilogy(input_omega,A(:,k))
+    semilogy(input_omega,Amp(:,k))
     hold on
 end
 
