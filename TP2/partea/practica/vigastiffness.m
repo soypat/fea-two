@@ -1,4 +1,4 @@
-function [Ke] = vigastiffness(E,nu,A,Iz,Iy,K,L)
+function [Ke,Me] = vigastiffness(E,nu,rho,A,Iz,Iy,K,L)
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
     X=A*E/L;
@@ -24,5 +24,22 @@ function [Ke] = vigastiffness(E,nu,A,Iz,Iy,K,L)
         0 0 0 -S 0 0 0 0 0 S 0 0
         0 0 -Z2 0 Z4 0 0 0 Z2 0 Z3 0
         0 Y2 0 0 0 Y4 0 -Y2 0 0 0 Y3];
+    D=0;
+    a=L;
+    rx=sqrt(Iz/A);
+    Mediag = blkdiag(70,78,78,70*rx^2,8*a^2, 8*a^2, 70, 78, 78, 70*rx^2,8*a^2,8*a^2);
+    Me = rho*A*L/105 * [D 0 0 0 0 0 35 0 0 0 0 0;
+                        0 D 0 0 0 22*a 0 27 0 0 0 -13*a;
+                        0 0 D 0 -22*a 0 0 0 27 0 13*a 0;
+                        0 0 0 D 0 0 0 0 0 -35*rx^2 0 0;
+                        0 0 0 0 D 0 0 0 -13*a 0 -6*a^2 0;
+                        0 0 0 0 0 D 0 13*a 0 0 0 -6*a^2;
+                        0 0 0 0 0 0 D 0 0 0 0 0;
+                        0 0 0 0 0 0 0 D 0 0 0 -22*a;
+                        0 0 0 0 0 0 0 0 D 0 22*a 0;
+                        0 0 0 0 0 0 0 0 0 D 0 0;
+                        0 0 0 0 0 0 0 0 0 0 D 0;
+                        0 0 0 0 0 0 0 0 0 0 0 D];
+   Me = Me+Me'+Mediag;
 end
 

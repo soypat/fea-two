@@ -61,6 +61,7 @@ masa=size(nodos,1);
 Nvigas = size(elementos,1);
 %% Vigamaterials
 E = 200e9;
+rho = 7900;
 nu=0.3;
 h=.02;
 b= .02;
@@ -69,20 +70,67 @@ Iz = b*h^3/12;
 Iy = h*b^3/12;
 Jxy = h*b*h*b/64;
 
+
+
+
+
 %% Dofinitions
+
 Nnod = size(nodos,1);
 n2d6=@(n) [n.*6-5 n.*6-4 n.*6-3 n.*6-2 n.*6-1 n.*6];
 elemDof = [n2d6(elementos(:,1)) n2d6(elementos(:,2))];
 dof = Nnod*6;
 K = zeros(dof,dof);
+M = zeros(dof,dof);
 
 for e = 1:Nvigas
     storeTo = elemDof(e,:);
     n1=nodos(elementos(e,1),:);n2=nodos(elementos(e,2),:);
-    L=norm(n2-n1);
-    ke = vigastiffness(E,nu,A,Iz,Iy,Jxy,L);
+    Le=norm(n2-n1);
+  
+    [ke, me] = vigastiffness(E,nu,rho,A,Iz,Iy,Jxy,Le);
+    Ke = vigorotar(ke,n1,n2,[0 0 1]);
+    Me = vigorotar(me,n1,n2,[0 0 1]);
+    
+    K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
+    M(storeTo,storeTo) = M(storeTo,storeTo) + Me;
+end
+%% Comenzamos a definir las condiciones de borde así matamos giros en barras
+isFixed = false(dof,1);
+Nrigid = Nrojo;
+for e = 1:Nrigid %Unimos barras a la masa, para sustituir lo que seria un rigid link
+    storeTo = [n2d6(rojos(e)) n2d6(masa)];
+    n1=nodos(rojos(e),:);n2=nodos(masa,:);
+    Le=norm(n2-n1);
+    [ke, ~] = vigastiffness(E,nu,0,A*10,0,0,0,Le);
     Ke = vigorotar(ke,n1,n2,[0 0 -1]);
     K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
+    isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual
+    
+end
+%% Acoplo masa puntual
+masapuntual = 1e6*blkdiag(.055, .055, .055, 0.49, 0.28455,0.28455);
+storeTo = n2d6(masa);
+M(storeTo,storeTo)=M(storeTo,storeTo) + masapuntual;
+
+%% Creo las condiciones de bordes en forma de bulones
+Eb=200e9/1e3;
+d =20e-3; %20mm
+Ab= d^2/4*pi;
+Lb =70e-3; %70mm
+Lbtransversal = d;
+kb = Eb*Ab/Lb;
+kbt = Eb*Ab/Lbtransversal;
+[Kg, ~] = acoplarBuloncitos(azules,K,[kb kbt kbt]); %Hice esta funcion pesimamente. devuelve tamaño inecesario
+%% Aplico condiciones de borde! En este caso es impedir que giren las barras conectadas a la masa puntual
+K = Kg(1:dof,1:dof);
+isFree=~isFixed;
+Kr = K(isFree,isFree);
+Mr = M(isFree,isFree);
+digitosPerdidos = get_cond(Kr);
+if digitosPerdidos >10
+    error('Condicionamiento malo!')
 end
 
 
+resonance

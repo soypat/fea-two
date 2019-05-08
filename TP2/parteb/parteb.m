@@ -151,3 +151,4 @@ Cmodal = Phi'*(alfa*Mg(isFree,isFree) +beta*Kg(isFree,isFree))*Phi;
 
 
 
+
