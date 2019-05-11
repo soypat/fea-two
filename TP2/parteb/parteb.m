@@ -19,7 +19,7 @@ viga=@(E,I,L)(E*I/L^3)*[12   6*L    -12   6*L;
                         -12  -6*L   12    -6*L;
                         6*L  2*L^2  -6*L  4*L^2];
 b=20e-3; % 3cm
-h=20e-3; % 1cm
+h=10e-3; % 1cm
 % h=0.0005; %medio milimetro
 I=b*h^3/12;
 Amp=b*h;
@@ -87,9 +87,30 @@ omega2 = sqrt(diag(ESP)); % y una cuarta para que tengas
 
 % [omegaray ray omega omega2] %Descomentar para ver que son identicas
 
-%% Cargas Externas / cargas modales (P y Rmodal [son lo mismo])
-input_omega = 1:1:10000;
+
+%% DEFINO ESPECTRO DE DISEÑO
+Nmodos = 3;
+omega2 = omega(end-Nmodos+1);
+omega1 = omega(end);
+
+input_omega = 1:1:(omega2*(1.25));
 Nfrec = length(input_omega);
+
+input_ksi = 0.05:0.05:0.3;
+
+
+Nksi = length(input_ksi);
+ksinames = cell(Nksi,1);
+ksipropnames = cell(Nksi,1);
+ksipropnames2 = cell(Nksi,1);
+Amp = zeros(Nfrec,Nksi);
+Aprop = zeros(Nfrec,Nksi); %xi1 fijo
+Aprop2 = zeros(Nfrec,Nksi); %Aprop2 va ser proporcional con xi2 fijo
+
+
+
+%% Cargas Externas / cargas modales (P y Rmodal [son lo mismo])
+
 
 acel = @(x,A,omega) A.*sin(omega.*x);
 Rext = zeros(dof,1); % (11.7-5) cook
@@ -109,21 +130,6 @@ Rprop = abs(g*Mg(isFree,isFree)*Rextred);
 Rmodalenfrecuencia=abs(Rmodalenfrecuencia); %No entiendo 
 
 %%
-input_ksi = 0.0001:0.05:0.3;
-Nksi = length(input_ksi);
-ksinames = cell(Nksi,1);
-ksipropnames = cell(Nksi,1);
-ksipropnames2 = cell(Nksi,1);
-Amp = zeros(Nfrec,Nksi);
-Aprop = zeros(Nfrec,Nksi); %xi1 fijo
-Aprop2 = zeros(Nfrec,Nksi); %Aprop2 va ser proporcional con xi2 fijo
-Nmodos = 3;
-omega2 = omega(end-Nmodos+1);
-omega1 = omega(end);
-
-
-% axprop = axes
-
 
 for k = 1:Nksi
     ksi2 = input_ksi(k);
