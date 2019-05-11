@@ -144,7 +144,7 @@ Hallar para el problema descrito en la figura \ref{fig:enunciado}:
 \end{figure}
 Cabe destacar que el enunciado original otorgado por la cátedra sugería usar para la aceleración excitadora $\ddot{u}=\sin (\Omega x)$, el cual nos daría un sistema cuasiestático poco interesante.\footnote{a no ser que $\Omega$ esté en función del tiempo y no se haya especificado}
 
-\subsection{Método}
+\section{Método}
 Se resuelve el problema por método de los elementos finitos utilizando vigas de dos nodos. Cada nodo tiene dos grados de libertad, $v$ como el desplazamiento en $y$ y $\theta$ siendo el giro de la viga en el plano $x\!y$.
 
 La matriz de masa usada es \textit{consistente}. Esta y la matriz de rigidez toman la forma: \cite[p.379]{cook2007concepts}
@@ -158,12 +158,30 @@ Se resuelve el problema de autovalores para el sistema sin amortiguamiento \eqre
 	\left( \Mme{K} - \omega^2 \Mme{M}\right)\Cme{D}= 0
 \end{equation}
 
-Luego se busca la respuesta armónica del sistema ante la carga conocida 
+Luego se busca la respuesta armónica del sistema ante la carga conocida. La formulación \textbf{modal} es la siguiente
+\begin{equation} \label{eq:Zmodal}
+	\Cme{Z} = \frac{\Cme{R\modal }}{{\Cme{\Omega}}^2 \sqrt{(1-\chi^2)^2 + (2 \dampfact \chi)^2}}
+\end{equation}
+donde $\chi = \frac{\omega_{\mathrm{exc}}}{\Cme{\Omega}}$ y $\dampfact$ se elige a criterio del usuario.
 
+La formulación \textbf{proporcional} propone que el amortiguamiento es una combinación lineal de la masa y la rigidez. Se propone estudiar la respuesta proporcional de la misma forma que la modal según:
+\begin{equation}
+	\Cme{D} = \frac{\Cme{R }}{{\Cme{\Omega}}^2 \sqrt{(1-\chi^2)^2 + (2 \dampfact \chi)^2}}
+\end{equation}
+donde $\chi = \frac{\omega_{\mathrm{exc}}}{\Cme{\Omega}}$ y 
+$\dampfact = \tfrac{1}{2} \left(\frac{\alpha}{\omega_{\mathrm{exc}}} +\beta \omega_{\mathrm{exc}} \right) $.
+Si se quiere estudiar un rango de frecuencias excitadoras tal que $\omega_{\mathrm{exc}}\in [\omega_1, \omega_2]$ y eligiendo dos valores de amortiguamiento para ambas frecuencias $\dampfact_1$ y $\dampfact_2$ se tiene: \cite{cook2007concepts}
+\begin{align} \label{eq:alfabeta}
+\alpha &= 2\omega_1 \omega_2 (\dampfact_1 \omega_2 -\dampfact_2 \omega_1)/(\omega_2^2 - \omega_1^2) \\ \beta &= 2(\dampfact_2\omega_2 -\dampfact_1 \omega_1)/(\omega_2^2 - \omega_1^2)
+\end{align}
 
+Se opta por estudiar el rango de amortiguamiento  $\varsigma\in \{0,05;\, 0,3\}$. Este es el rango inferior por donde se puede encontrar el amortiguamiento para problemas similares al enunciado.
+\begin{itemize}
+	\item Para el barrido de frecuencias de amortiguamiento proporcional se investigará el caso donde se elija $\varsigma_1=0,05$ fijo y variando $\varsigma_2$ para obtener las curvas de respuesta a frecuencia.
+	\item El otro caso investigado será $\varsigma_2=0,3$ fijo variando así $\varsigma_1$.
+\end{itemize}
 
-
-\subsection{Resultados}
+\section{Resultados}
 Las primeras tres frecuencias naturales obtenidas con una solución de 8 elementos.
 \[
 \Cme{\Omega} = \begin{Bmatrix}
@@ -179,24 +197,47 @@ Las primeras tres frecuencias naturales obtenidas con una solución de 8 element
 \end{Bmatrix}
 \]
 
+\begin{figure}[htb!] 
+	\centering
+	\includegraphics[width=1\textwidth]{fig/modos.eps}
+	\caption{Modos de deformación para las frecuencias naturales. El modo 1 corresponde a la frecuencia más baja.}
+	\label{fig:modos}
+\end{figure}
 
 \begin{figure}[htb!]
 	\centering
-	\includegraphics[width=0.8\textwidth]{fig/sinesweep.eps}
+	\includegraphics[width=1\textwidth]{fig/sinesweep.eps}
 	\caption{Barrido de frecuencia \textbf{modal}. Valores de amplitud máxima recuadrados.}
+	\label{fig:sinesweepmodal}
 \end{figure}
 
 \begin{figure}[htb!]
 	\centering
-	\includegraphics[width=0.8\textwidth]{fig/sinesweepprop.eps}
-	\caption{Barrido de frecuencia \textbf{proporcional}. Valores de amplitud máxima recuadrados.}
+	\includegraphics[width=1\textwidth]{fig/sinesweepprop1const.eps}
+	\caption{Barrido de frecuencia \textbf{proporcional}.}
+	\label{fig:sinesweepprop1}
+\end{figure}
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=1\textwidth]{fig/sinesweepprop2const.eps}
+	\caption{Barrido de frecuencia \textbf{proporcional}.}
+	\label{fig:sinesweepprop2}
 \end{figure}
 
 
-\subsection{Conclusiones}
+
 
 
 \clearpage
+\section{Conclusiones}
+Se informa al lector el hallazgo de la frecuencias naturales. Dichas frecuencias están separadas por un $\Delta \omega $ considerable. Esto es deseable para cuando se tenga una carga cíclica esta trabaje lejos de cualquier frecuencia natural, y si es posible, por debajo de todas. Dado que no se especifico ninguna característica técnica del problema, el gráfico \ref{fig:modos} es más una curiosidad. Las formas de los modos no están a escala ni tienen unidades, es solo la forma de respuesta. 
+
+A medida que la frecuencia de excitación aumenta la \textit{amplitud del sistema disminuye}\footnote{Excepto en cercanías de una frecuencia natural} (ver figura \ref{fig:sinesweepmodal}). Es interesante pensar que si aumentara no tendría sentido buscar las frecuencias naturales porque estas son caracterizadas por un máximo de amplitud. Las curvas del barrido de frecuencia son decrecientes en lejanía de una frecuencia natural porque para una fuerza cíclica $F(t)=F_0\sin \omega t$ el tiempo que actúa en una dirección es inversamente proporcional a la frecuencia. Por ende la estructura no tiene tiempo para moverse lejos antes de que se invierta la dirección de la fuerza.
+
+El efecto del amortiguamiento es reducir la amplitud cerca de la frecuencia natural. En la figura \ref{fig:sinesweepmodal} se puede apreciar el efecto claramente. Las siguientes dos figuras (\ref{fig:sinesweepprop1} y \ref{fig:sinesweepprop2}) tienen un nivel agregado de profundidad. Se estudia el efecto la \textit{fracción de amortiguamiento crítico} \cite{cook2007concepts} cuando se varían los amortiguamientos de los puntos borde del espectro de diseño. Como es de esperar para un valor mayor $\dampfact_1$ se amortiguarán las frecuencias más bajas sin efecto a frecuencias altas. De forma complementaria, si se aumenta $\dampfact_2$ la amplitud de la primera frecuencia natural no se ve afectada mientras que a frecuencias más altas se reduce la amplitud considerablemente.
+
+
 \bibliography{labibliografia} % Indica archivo
 \bibliographystyle{plainnat} 
 

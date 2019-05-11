@@ -1,6 +1,6 @@
 
 Ndofpornod = 2;
-Nelem = 8;
+Nelem = 40;
 L=.5; % 0.5 metros % TODO UNIDADES ESTANDAR
 [nodos3d,elementos,elemDof]=meshViga([0 0 0],[L 0 0],Nelem,Ndofpornod,1);
 nodos = nodos3d(:,[1 2]);
@@ -61,12 +61,7 @@ Db = Vr;
 %Cantidad de dof despues de reduccion
 dofred = size(Vr,2); % Lo mismo que %dofred=sum(isFree)
 
-% PLOTEO ALGO
-Ug = flip(flip(V,1),2); % Desplazamientos globales Ug (incluye angulos)
-Uy = Ug(1:2:end,:); %Desplazamientos en y 
 
-n = 4; % Numero de modo.
-plot(nodos(:,1),Uy(:,n));
 
 
 
@@ -114,29 +109,52 @@ Rprop = abs(g*Mg(isFree,isFree)*Rextred);
 Rmodalenfrecuencia=abs(Rmodalenfrecuencia); %No entiendo 
 
 %%
-input_ksi = 0.05:0.05:0.3;
+input_ksi = 0.0001:0.05:0.3;
 Nksi = length(input_ksi);
 ksinames = cell(Nksi,1);
+ksipropnames = cell(Nksi,1);
+ksipropnames2 = cell(Nksi,1);
 Amp = zeros(Nfrec,Nksi);
-Aprop = zeros(Nfrec,Nksi);
-figure(1)
-% axmodal = axes
+Aprop = zeros(Nfrec,Nksi); %xi1 fijo
+Aprop2 = zeros(Nfrec,Nksi); %Aprop2 va ser proporcional con xi2 fijo
+Nmodos = 3;
+omega2 = omega(end-Nmodos+1);
+omega1 = omega(end);
 
-figure(2)
+
 % axprop = axes
 
 
 for k = 1:Nksi
+    ksi2 = input_ksi(k);
+    ksi1 = .05;
+    
+    ksi22 = input_ksi(end);
+    ksi11 = input_ksi(end-k+1);
+%     ksi2 = input_ksi(end);
+%     ksi1 = input_ksi(2);
+    
+    alpha = 2*omega1*omega2*(ksi1*omega2-ksi2*omega1)/(omega2^2 - omega1^2);
+    beta = 2*(ksi2*omega2-ksi1*omega1)/(omega2^2 - omega1^2);
+    
+    alpha2 = 2*omega1*omega2*(ksi11*omega2-ksi22*omega1)/(omega2^2 - omega1^2);
+    beta2 = 2*(ksi22*omega2-ksi11*omega1)/(omega2^2 - omega1^2);
     for f = 1:Nfrec
         z=zeros(dofred,1);
         d=zeros(dofred,1);
+        d2=zeros(dofred,1);
+        propksi = .5*(alpha/input_omega(f)+beta*input_omega(f));
+        propksi2 = .5*(alpha2/input_omega(f)+beta2*input_omega(f));
         for i=1:dofred
-            beta = input_omega(f)/omega(i);
-            d(i) = (Rprop(i)/omega(i)^2)/sqrt((1-beta^2)^2+(2*input_ksi(k)*beta)^2);
-            z(i) = (Rmodalenfrecuencia(i,f)/omega(i)^2)/sqrt((1-beta^2)^2+(2*input_ksi(k)*beta)^2);
+            chi = input_omega(f)/omega(i);
+            d(i) = (Rprop(i)/omega(i)^2)/sqrt((1-chi^2)^2+(2*propksi*chi)^2);
+            d2(i) = (Rprop(i)/omega(i)^2)/sqrt((1-chi^2)^2+(2*propksi2*chi)^2);
+            z(i) = (Rmodalenfrecuencia(i,f)/omega(i)^2)/ ...
+                sqrt((1-chi^2)^2+(2*input_ksi(k)*chi)^2);
         end
         Amp(f,k) = abs(sum(z));% tomo valor absoluto para que me quede lindo
         Aprop(f,k) = abs(sum(d));
+        Aprop2(f,k) = abs(sum(d2));
     end
 %     hold(axmodal,'on')
     figure(1)
@@ -146,8 +164,13 @@ for k = 1:Nksi
     figure(2)
     semilogy(input_omega/(2*pi),Aprop(:,k))
     hold on
-    ksinames{k} = sprintf("\\varsigma =%0.2f",input_ksi(k));
+    figure(3)
+    semilogy(input_omega/(2*pi),Aprop2(:,k))
+    hold on
     
+    ksinames{k} = sprintf("\\varsigma =%0.2f",input_ksi(k));
+    ksipropnames{k} = sprintf("\\varsigma_2 =%0.2f",input_ksi(k));
+    ksipropnames2{k} = sprintf("\\varsigma_1 =%0.2f",input_ksi(end-k+1));
 end
 % GRAFICO titulos  etc
 figure(1)
@@ -155,13 +178,32 @@ title('Barrido de frecuencia de viga empotrada')
 ylabel('Amplitud')
 xlabel('Frecuencia [hz]')
 legend(ksinames)
-% hold(axmodal,'off')
+
 figure(2)
-title('Barrido de frecuencia proporcional')
+title('Barrido de frecuencia proporcional con \varsigma_1 constante')
 ylabel('Amplitud')
 xlabel('Frecuencia [hz]')
-legend(ksinames)
-% hold(axprop,'off')
+legend(ksipropnames)
+
+figure(3)
+title('Barrido de frecuencia proporcional con \varsigma_2 constante')
+ylabel('Amplitud')
+xlabel('Frecuencia [hz]')
+legend(ksipropnames2)
+
+% PLOTEO ALGO
+figure(4)
+Ug = flip(V,2); % Desplazamientos globales Ug (incluye angulos)
+Uy = Ug(1:2:end,:); %Desplazamientos en y 
+n = 3; % Numeros de modos.
+for i=1:n 
+    subplot(n,1,i)
+    plot(nodos(:,1),Uy(:,i));
+    ylabel('Desplazamientos [UA]')
+    xlabel('Posición [m]')
+    title(sprintf('Modo %0.0i',i))
+end
+
 
 
 %% Damping Proporcional 
@@ -172,8 +214,8 @@ xi2= xi1;
 w1 = omega(end);
 w2 = omega(end-1);
 alfa = 2*w1*w2*(xi1*w2-xi2*w1)/(w2^2-w1^2);
-beta = 2*(xi2*w2-xi1*w1)/(w2^2-w1^2);
-Cprop = alfa*Mg(isFree,isFree) +beta*Kg(isFree,isFree);
+chi = 2*(xi2*w2-xi1*w1)/(w2^2-w1^2);
+Cprop = alfa*Mg(isFree,isFree) +chi*Kg(isFree,isFree);
 
 Cmodal = Phi'*(Cprop)*Phi;
 
