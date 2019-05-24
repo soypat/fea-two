@@ -68,7 +68,8 @@ for e = 1:Nrojo %Unimos barras a la masa, para sustituir lo que seria un rigid l
     isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar su muerte
     end
 end
-
+Draw_Barra(rigidElementos,nodos,'k')
+title('Rigid Links')
 %% Acoplo masa puntual
 masapuntual = 1e6*blkdiag(.055, .055, .055, 0.49, 0.28455,0.28455);
 storeTo = n2d6(masa);
@@ -96,6 +97,5 @@ Kr = K(isFree,isFree);
 Mr = M(isFree,isFree);
 
 resonance
-Draw_Barra(rigidElementos,nodos,'k')
-title('Rigid Links')
+
 
