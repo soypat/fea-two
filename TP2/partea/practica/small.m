@@ -105,13 +105,18 @@ for e = 1:Nrigid %Unimos barras a la masa, para sustituir lo que seria un rigid 
     [ke, ~] = vigastiffness(E,nu,0,A*10,0,0,0,Le);
     Ke = vigorotar(ke,n1,n2,[0 0 -1]);
     K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
-    isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual
-    
+    isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar
 end
 %% Acoplo masa puntual
 masapuntual = 1e6*blkdiag(.055, .055, .055, 0.49, 0.28455,0.28455);
 storeTo = n2d6(masa);
 M(storeTo,storeTo)=M(storeTo,storeTo) + masapuntual;
+%% Mato z sobre masa puntual
+storeTo = n2d6(masa);
+isFixed(storeTo(3))=true;
+%% Mato giro en x sobre viga
+dofViga = reshape(n2d6([rojos;azules])',[],1);
+isFixed(dofViga(4:6:end)) = true;
 
 %% Creo las condiciones de bordes en forma de bulones
 Eb=200e9/1e3;
@@ -121,7 +126,7 @@ Lb =70e-3; %70mm
 Lbtransversal = d;
 kb = Eb*Ab/Lb;
 kbt = Eb*Ab/Lbtransversal;
-[Kg, ~] = acoplarBuloncitos(azules,K,[kb kbt kbt]); %Hice esta funcion pesimamente. devuelve tamaño inecesario
+Kg = abulonar(azules,K,[kb kbt kbt]); %Hice esta funcion pesimamente. devuelve tamaño inecesario
 %% Aplico condiciones de borde! En este caso es impedir que giren las barras conectadas a la masa puntual
 K = Kg(1:dof,1:dof);
 isFree=~isFixed;

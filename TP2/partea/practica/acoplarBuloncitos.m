@@ -1,5 +1,5 @@
 function [Kg fixity] = acoplarBuloncitos(azules,K,kb)
-%
+% LEGACY. No usar
 n2d6=@(n) [n.*6-5 n.*6-4 n.*6-3 n.*6-2 n.*6-1 n.*6];
 n2d3 = @(n) [n.*3-2 n.*3-1 n.*3];
 

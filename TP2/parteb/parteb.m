@@ -1,6 +1,6 @@
 
 Ndofpornod = 2;
-Nelem = 40;
+Nelem = 8;
 L=.5; % 0.5 metros % TODO UNIDADES ESTANDAR
 [nodos3d,elementos,elemDof]=meshViga([0 0 0],[L 0 0],Nelem,Ndofpornod,1);
 nodos = nodos3d(:,[1 2]);
@@ -80,13 +80,11 @@ for i = 1:dofred
     omegaray(i) = sqrt((Dbi' * Kg(isFree,isFree) *Dbi)/aux);% Cook (11.4-13)
     ray(i)= sqrt((Phii' * Kg(isFree,isFree) *Phii)/(Phii' * Mg(isFree,isFree) *Phii)); %Cook (11.7-1)b
     omega(i) = sqrt(Phii'* Kg(isFree,isFree)*Phii); % Idem
-    % Wow son identicas las tres! como es? magia?  <No boludo, es matematica. si M=1 entonces obvio>
 end
 ESP  = Phi' * Kg(isFree,isFree) *Phi;
 omega2 = sqrt(diag(ESP)); % y una cuarta para que tengas
 
-% [omegaray ray omega omega2] %Descomentar para ver que son identicas
-
+[omegaray ray omega omega2 sqrt(diag(eigVal))] %Descomentar para ver que son identicas
 
 %% DEFINO ESPECTRO DE DISEÑO
 Nmodos = 3;
@@ -97,7 +95,6 @@ input_omega = 1:1:(omega2*(1.25));
 Nfrec = length(input_omega);
 
 input_ksi = 0.05:0.05:0.3;
-
 
 Nksi = length(input_ksi);
 ksinames = cell(Nksi,1);
