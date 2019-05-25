@@ -3,7 +3,8 @@ LargoMotor = 5.719;
 % Modifiables
 AB = [1.5 1];
 longE = LargoMotor/4*ones(4,1)';%[1.2 2.95 ]
-
+omegaexc = 600/10*2*pi;
+Lelemax=.1; %Longitud máxima de elementos
 
 % No-modificables
 rojoX = [417 667 1197 1727 2257 2787 3317 3847 4377 4907 5437]'/1000;
@@ -24,13 +25,13 @@ Nvigas = size(elementos,1);
 E = 200e9;
 rho = 7900;
 nu=0.3;
-h=.02;
-b= .02;
+h=.06;
+b= .04;
 A=b*h;
 Iz = b*h^3/12;
 Iy = h*b^3/12;
-Jxy = h*b*h*b/64;
-
+Jxy = h*b*(h^2 + b^2)/12;
+% Jxy = h*b*h*b/64;
 %% Dofinitions
 Nnod = size(nodos,1);
 n2d6=@(n) [n.*6-5 n.*6-4 n.*6-3 n.*6-2 n.*6-1 n.*6];
@@ -55,14 +56,14 @@ end
 %% ""Rigid Links""
 isFixed = false(dof,1);
 Nrigid = Nrojo*2;
+krigid = 1e8;
 rigidElementos =[];
 for e = 1:Nrojo %Unimos barras a la masa, para sustituir lo que seria un rigid link
     for i=1:2
     storeTo = [n2d6(rojos(e)) n2d6(masa)];
     n1=nodos(rojos(e,i),:);n2=nodos(masa,:);
     rigidElementos = [rigidElementos;rojos(e,i) masa];
-    Le=norm(n2-n1);
-    [ke, ~] = vigastiffness(E,nu,0,A*10,0,0,0,Le);
+    [ke, ~] = vigastiffness(krigid,nu,0,1,0,0,0,1);
     Ke = vigorotar(ke,n1,n2,[0 0 -1]);
     K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
     isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar su muerte
@@ -95,6 +96,14 @@ K = abulonar(azules(:,2),K,[kb kbt kbt]); %Restringo las otras
 isFree=~isFixed;
 Kr = K(isFree,isFree);
 Mr = M(isFree,isFree);
+%% Busco Fuerzas para causar desplazamientos iniciales
+D0 = zeros(dof,1);
+
+Dmasa = [0 0 10e-3 0 0 0]; % se mueve 10mm en y
+storeTo = n2d6(masa);
+D0(storeTo) = Dmasa;
+
+Rr = Kr*D0(isFree);
 
 resonance
 

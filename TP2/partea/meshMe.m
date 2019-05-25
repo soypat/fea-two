@@ -5,7 +5,7 @@ Nazul = length(azulX);
 Nrojo = length(rojoX);
 Nsop = length(soporteX);
 elementos =[];
-Lelemax=.4; %Longitud máxima de elementos
+
 %% Mesheo primer soporte
 nodos = [0 0 0;0 ancho 0];
 [nodos, elementos] = mesh1DL(nodos,1,2,Lelemax);
