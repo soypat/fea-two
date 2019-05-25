@@ -80,9 +80,9 @@
 	\vspace{2cm}
 	{\Large \scshape Elementos Finitos II - 31.92 \par}
 	\vspace{2cm}
-	{\Huge \scshape Estudio de una viga\par }
+	{\Huge \scshape Estudio de vibraciones de una viga y un motor utilizando el método de elementos finitos\par }
 	\vspace{.5cm}
-	{\Large Y un motor a venir \par}
+	{\Large  \par}
 	\vspace{2cm}
 	{\large \bf Autor \par}
 	\vspace{.5cm}
@@ -91,9 +91,9 @@
 	{\par \large Fecha de realización: \today \par}
 	\vspace{1cm}
 	{\large Fecha de entrega: .......................................\par}
-	\vspace{2.5cm}
+	\vspace{\fill}
 	{\large Firma del docente: .......................................}
-	\vspace{3cm}
+	\vspace{\fill}
 	\begin{figure}[htb!]
 		\centering
 		\includegraphics[width=6cm]{fig/logoitba.png}
@@ -111,11 +111,12 @@
 	\glossentry{\Cme{D}}{Vector de desplazamientos.}
 	\glossentry{p}{Carga de presión.}
 	\glossentry{\kappa_{0}}{Curvatura de placa inicial.}
+	\glossary{\Mme{C}}{Matriz de amortiguamiento.}
 \end{multicols}
 
 
 \tableofcontents
-
+\part{Viga Empotrada}
 \section{Introducción Teórica}
 Cuando se tiene una carga dependiente del tiempo la respuesta estructural también lo es. En el caso que sea un problema cuasiestático la resolución se puede hacer para los instantes de tiempos interesantes. Caso contrario se precisa efectuar un \textit{análisis dinámico}.
 \[
@@ -158,18 +159,28 @@ Se resuelve el problema de autovalores para el sistema sin amortiguamiento \eqre
 	\left( \Mme{K} - \omega^2 \Mme{M}\right)\Cme{D}= 0
 \end{equation}
 
-Luego se busca la respuesta armónica del sistema ante la carga conocida. La formulación \textbf{modal} es la siguiente
+Luego se busca la respuesta armónica del sistema ante la carga conocida. Se propone estudiarlo con las autoformas.
 \begin{equation} \label{eq:Zmodal}
-	\Cme{Z} = \frac{\Cme{R\modal }}{{\Cme{\Omega}}^2 \sqrt{(1-\chi^2)^2 + (2 \dampfact \chi)^2}}
+	 \Cme{\boldsymbol{\ddot{\mathrm{Z}}}}+2\COmega \Cme{C\modal} \Cme{\boldsymbol{\dot{\mathrm{Z}}}} + \COmega^2 \Cme{Z} = \Cme{R\modal}
 \end{equation}
-donde $\chi = \frac{\omega_{\mathrm{exc}}}{\Cme{\Omega}}$ y $\dampfact$ se elige a criterio del usuario.
-
-La formulación \textbf{proporcional} propone que el amortiguamiento es una combinación lineal de la masa y la rigidez. Se propone estudiar la respuesta proporcional de la misma forma que la modal según:
+cuya resolción resulta en 
 \begin{equation}
-	\Cme{D} = \frac{\Cme{R }}{{\Cme{\Omega}}^2 \sqrt{(1-\chi^2)^2 + (2 \dampfact \chi)^2}}
+	\Cme{Z} = \frac{\Cme{R\modal }}{{\COmega}^2 \sqrt{(1-\chi^2)^2 + (2 \Cme{C\modal} \chi)^2}}
 \end{equation}
-donde $\chi = \frac{\omega_{\mathrm{exc}}}{\Cme{\Omega}}$ y 
-$\dampfact = \tfrac{1}{2} \left(\frac{\alpha}{\omega_{\mathrm{exc}}} +\beta \omega_{\mathrm{exc}} \right) $.
+donde $\chi = \frac{\omega_{\mathrm{exc}}}{\Cme{\Omega}}$.
+
+La formulación de \textbf{amortiguamiento modal} es la siguiente
+
+\begin{equation}
+\Mme{C\modal}=\left[ \begin{array}{ccc}{2 \omega_{n} \dampfact_{n}} & {0} & {0} \\ {0} & {\ddots} & {0} \\ {0} & {0} & {2 \omega_{1} \dampfact_{1}}\end{array}\right]
+\end{equation}
+eligiendosé un $\dampfact$ para cada modo.
+
+La formulación de \textbf{amortiguamiento proporcional} propone una combinación lineal de la masa y la rigidez según
+\begin{equation} \label{eq:proporcional}
+\Mme{C\modal} = \Mme{\Phib}^T ( \alpha \Mme{M}+\beta \Mme{K})\Mme{\Phib} = \alpha \Mme{I} +\beta \Mme{\Omegab^2}
+\end{equation}
+
 Si se quiere estudiar un rango de frecuencias excitadoras tal que $\omega_{\mathrm{exc}}\in [\omega_1, \omega_2]$ y eligiendo dos valores de amortiguamiento para ambas frecuencias $\dampfact_1$ y $\dampfact_2$ se tiene: \cite{cook2007concepts}
 \begin{align} \label{eq:alfabeta}
 \alpha &= 2\omega_1 \omega_2 (\dampfact_1 \omega_2 -\dampfact_2 \omega_1)/(\omega_2^2 - \omega_1^2) \\ \beta &= 2(\dampfact_2\omega_2 -\dampfact_1 \omega_1)/(\omega_2^2 - \omega_1^2)
@@ -237,7 +248,16 @@ A medida que la frecuencia de excitación aumenta la \textit{amplitud del sistem
 
 El efecto del amortiguamiento es reducir la amplitud cerca de la frecuencia natural. En la figura \ref{fig:sinesweepmodal} se puede apreciar el efecto claramente. Las siguientes dos figuras (\ref{fig:sinesweepprop1} y \ref{fig:sinesweepprop2}) tienen un nivel agregado de profundidad. Se estudia el efecto la \textit{fracción de amortiguamiento crítico} \cite{cook2007concepts} cuando se varían los amortiguamientos de los puntos borde del espectro de diseño. Como es de esperar para un valor mayor $\dampfact_1$ se amortiguarán las frecuencias más bajas sin efecto a frecuencias altas. De forma complementaria, si se aumenta $\dampfact_2$ la amplitud de la primera frecuencia natural no se ve afectada mientras que a frecuencias más altas se reduce la amplitud considerablemente.
 
+\part{Estudio de Motor}
+\section{Introducción}
 
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.6\textwidth]{fig/modelomotor.eps}
+	\caption{Modelo del motor.}
+	\label{fig:modelomotor}
+\end{figure}
 \bibliography{labibliografia} % Indica archivo
 \bibliographystyle{plainnat} 
 
