@@ -11,8 +11,8 @@ Db = Vr;
 dofred = size(Vr,2); % Lo mismo que %dofred=sum(isFree)
 
 Phi = zeros(dofred,dofred);
-omega = zeros(dofred,1);
-
+% omega = zeros(dofred,1);
+omega = sqrt(diag(eigVal));
 for i = 1:dofred
     Dbi=Db(:,i);
     
@@ -20,13 +20,13 @@ for i = 1:dofred
     
     Phi(:,i) = Dbi/sqrt(aux);
     Phii = Phi(:,i); %Phii = []
-    omega(i) = sqrt((Dbi' * Kr *Dbi)/aux);% Cook (11.4-13)
+%     omega(i) = sqrt((Dbi' * Kr *Dbi)/aux);% Cook (11.4-13)
 end
-ESP  = Phi' * Kr *Phi;
-omega2 = sqrt(diag(ESP)); % y una cuarta para que tengas
+% ESP  = Phi' * Kr *Phi;
+% omega2 = sqrt(diag(ESP)); % y una cuarta para que tengas
 
 Nmodos = 3;
-omega2 = omega(end-Nmodos+1);
+omega2 = omegaexc*1.15;
 omega1 = omega(end);
 ksi1=0.06;
 ksi2=0.2;
@@ -35,7 +35,7 @@ alpha = 2*omega1*omega2*(ksi1*omega2-ksi2*omega1)/(omega2^2 - omega1^2);
 beta = 2*(ksi2*omega2-ksi1*omega1)/(omega2^2 - omega1^2);
 Cprop = diag(alpha*eye(dofred,dofred)+beta*eigVal);
 %% Amortiguamiento Modal
-ksiModal = 0.05;
+ksiModal = 0.1;
 dampingModal = ksiModal*ones(dofred,1);
 Cmodal = (2*dampingModal'*eigVal)';
 

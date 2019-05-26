@@ -1,13 +1,3 @@
-%% PROBLEM
-LargoMotor = 5.719;
-% Modifiables
-AB = [1.8 1.8];
-longE = LargoMotor/4*ones(3,1)';%[1.2 2.95 ] %E1, E2, E3
-omegaexc = 600/10*2*pi;
-Lelemax=5; %Longitud máxima de elementos
-h=.06;
-b= .04;
-
 % No-modificables
 rojoX = [417 667 1197 1727 2257 2787 3317 3847 4377 4907 5437]'/1000;
 
@@ -16,9 +6,7 @@ CG = [1.855 ancho/2 1];
 
 %% Mesheador del basamento
 meshMe
-close all
-Draw_Barra(elementos,nodos,'k')
-title('Basamento')
+% title('Basamento')
 %% Mesheo masa
 nodos = [nodos;CG];
 Nnod = size(nodos,1);
@@ -33,12 +21,17 @@ nu=0.3;
 A=b*h;
 Iz = b*h^3/12;
 Iy = h*b^3/12;
-% Jxy = h*b*(h^2 + b^2)/12
-% Jp = h*b*h*b/64
-Jtors = h*b^3*(1/3-0.21*b/h*(1-b^4/12/h^4));
+if h>=b
+    Jtors = h*b^3*(1/3-0.21*b/h*(1-b^4/12/h^4));
+else
+    aux=h;h=b;b=aux;
+    Jtors = h*b^3*(1/3-0.21*b/h*(1-b^4/12/h^4));
+    b=h;h=aux;
+end
 %% Dofinitions
 Nnod = size(nodos,1);
 n2d6=@(n) [n.*6-5 n.*6-4 n.*6-3 n.*6-2 n.*6-1 n.*6];
+n2d3=@(n) [n.*6-5 n.*6-4 n.*6-3];
 elemDof = [n2d6(elementos(:,1)) n2d6(elementos(:,2))];
 dof = Nnod*6;
 %% Mass Stiffness Matrices
@@ -73,10 +66,7 @@ for e = 1:Nrojo %Unimos barras a la masa, para sustituir lo que seria un rigid l
     isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar su muerte
     end
 end
-Draw_Barra(rigidElementos,nodos(:,[1 3 2]),'k')
-title('Rigid Links plano xz')
-Draw_Barra(rigidElementos,nodos(:,[1 2 3]),'k')
-title('Rigid Links plano xy')
+
 %% Acoplo masa puntual
 masapuntual = 1e6*blkdiag(.055, .055, .055, 0.49, 0.28455,0.28455);
 storeTo = n2d6(masa);
@@ -109,8 +99,9 @@ Dmasa = [0 0 10e-3 0 0 0]; % se mueve 10mm en y
 storeTo = n2d6(masa);
 D0(storeTo) = Dmasa;
 
-Rr = Kr*D0(isFree);
-
+% Rr = Kr*D0(isFree);
+Rr = zeros(size(Kr,1),1);
+Rr(n2d3(masa)) = [0 0 4000]';
 resonance
 
 

@@ -11,7 +11,8 @@
 %\usepackage{natbib}
 
 
-
+\newcommand{\celsius}{^\circ \mathrm{C}}
+\newcommand{\air}{{\mathrm{humo}}}
 %Bibliografía
 
 % Simbolos para notas de pie
@@ -66,7 +67,7 @@
 \usepackage{siunitx}
 \newcommand{\glossentry}[2]{$#1\ $ \indent #2 \par \vspace{.4cm} }
 \newcommand{\adm}{\textrm{adm}}
-
+\renewcommand\thepart{\Alph{part}}
 
 \title{Informe Técnico - ITBA}
 
@@ -114,9 +115,10 @@
 	\glossary{\Mme{C}}{Matriz de amortiguamiento.}
 \end{multicols}
 
+\setcounter{section}{-1}
 
 \tableofcontents
-\part{Viga Empotrada}
+
 \section{Introducción Teórica}
 Cuando se tiene una carga dependiente del tiempo la respuesta estructural también lo es. En el caso que sea un problema cuasiestático la resolución se puede hacer para los instantes de tiempos interesantes. Caso contrario se precisa efectuar un \textit{análisis dinámico}.
 \[
@@ -129,7 +131,138 @@ El análisis dinámico busca la forma de deformación del sistema cuando este se
 
 Debido a este último punto es de sumo interés conocer la frecuencia natural de un sistema que tiene la posibilidad de someterse a una carga cíclica. Incluso puede ser de gran utilidad conocer el modo de deformación para entender como el sistema almacena energía. Un caso famoso de falla por resonancia es el de \textit{Tacoma Narrows} (Angostas de Tacoma, en español). La sección del puente tenía una forma doble-T acostado que, al girar en presencia de un viento con velocidad particular, creaba una diferencia de presiones excitadora entre el lado superior e inferior así contribuyendo al giro hasta por fin fallar.
 
-{\textbf{Problema}}\par
+
+\part{Estudio de Motor}
+\setcounter{section}{0}
+\section{Problema}
+
+\begin{itemize}
+	\item Se precisa proponer un modelo para la estructura y representar gráficamente.
+	\item Efectuar análisis modal y dimensionar las vigas del basamento. Considerar desplazamiento de $10$mm y $\omega_{\mathrm{exc}}=600\mathrm{rpm}$.
+	\item Proponer un diseño alternativo superador teórico dejando de lado la perspectiva económica. Este diseño debe reducir cargas transmitidas y los desplazamientos del equipo.
+\end{itemize}
+
+
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.6\textwidth]{fig/modelomotor.eps}
+	\caption{Modelo del motor a grandes rasgos.}
+	\label{fig:modelomotor}
+\end{figure}
+
+\section{Método}
+
+Elementos usados
+\begin{itemize}
+	\item Elemento masa 0D para masa puntual (sin rigidez)
+	\item Elementos viga Timoshenko con masa consistente para basamento
+	\item Elementos Barra simples para Rigid links con rigidez $\num{1e8}$ \si{\newton \per \meter} con matriz de masa nula
+	\item Elemento CBUSH para los bulones (nodos azules con $CB1$ en la figura \ref{fig:modelomotor}) con rigidez longitudinal de bulon $k_b$ en dirección $z$ y rigidez $\frac{k_b}{10}$ en $x$ e $y$ para representar el efecto de separar el motor del doble fondo con una resina.
+\end{itemize}
+
+Para el mallado se desarrollo un programa que cree los nodos y una los elementos automáticamente, tomando como input del usuario el tamaño nominal de los elementos viga. En la figura \ref{fig:modelobasamento} se ve el resultado de dicho programa con tamaño de elemento \textit{máximo.} Para la constante torsional $J_\tau$ se utilizó una formula aproximada para secciones rectangulares \eqref{eq:torsionalConstant}
+
+\begin{equation} \label{eq:torsionalConstant}
+J_{\tau}=h \cdot b^{3} \cdot\left(\frac{1}{3}-0,21 \cdot \frac{b}{h} \cdot\left(1-\frac{b^{4}}{12 \cdot h^{4}}\right)\right)
+\end{equation}
+donde $b$ es el lado corto y $h$ el lado largo.
+
+
+\begin{figure}[htb!]
+	\centering
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{fig/modelRLxy.eps}
+		\caption{Rigid links. Vista en plano $x\!y$.}
+		\label{fig:modeloRLxy}
+	\end{subfigure}
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{fig/modelRLxz.eps}
+		\caption{Rigid links. Vista en plano $x\!z$.}
+		\label{fig:modeloRLxz}
+	\end{subfigure}
+\end{figure}
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{fig/modelbasamento.eps}
+	\caption{Modelo Basamento. Vista en plano $x\!y$.Tome en cuenta que los nodos numerados no necesariamente tienen que coincidir con figura de rigid links.}
+	\label{fig:modelobasamento}
+\end{figure}
+
+\subsection*{Selección de parámetros}
+Para un primer análisis se fijaron las distancias entre los bulones de tal forma como para que tengan el mismo espacio entre ellos. Se optó por aplicar el mismo criterio para la posición de los soportes en $y$.
+
+
+\begin{table}[htb!]
+	\centering
+	\begin{tabular}{lllll}
+		& 1 & 2 & 3 & 4 \\ \hline
+		Uniones Abulonadas& 0,097 \si{\meter}  & 1,897 \si{ \meter} & 3,697 \si{ \meter} & 5,567 \si{ \meter} \\
+		Soportes en $y$& 1,5268 \si{\meter}  &2,9565\si{\meter}   & 4.3863 \si{\meter}  &  \\
+	\end{tabular}
+\caption{Posición en $x$ de los nodos correspondientes a los bulones que unen doble fondo con basamento y las vigas estructurales en $y$.}
+\end{table}
+
+Para dimensionar las vigas del basamento iteramos variando $h$ y $b$ para todas las vigas. El amortiguamiento del sistema está controlado por la resina en los bulones. Se decidió modelar esto como un amortiguamiento global de $\dampfact = 0,1$ en un análisis con amortiguamiento modal. La excitación $\omega_{\mathrm{exc}}$ es de 600 rpm y se calcula la amplitud de excitación según un desplazamiento de $10$mm sobre la masa puntual en la dirección $z$.
+
+Por último se va efectuar un análisis con amortiguamiento proporcional usando la primer frecuencia natural del sistema como $\omega_1$ y $\omega_2 = 1,15 \omega_{\mathrm{exc}}$. Se amortiguan estos modos con $\dampfact_{1}=0,06$ y $\dampfact_2=0,2$, respectivamente. El desarrollo de esta formulación queda detallada en la parte B de este informe. 
+
+\section{Resultados del dimensionamiento}
+Se ve una diferencia importante en la suavidad entre las superficies que representan la amplitud en función de $h$ y $b$ según el tipo de amortiguamiento usado. Sin embargo, ambas tienen una interpretación concreta.
+
+El amortiguamiento modal impone un amortiguamiento global. Esto implica que todo el espectro de frecuencias naturales entra en juego para una excitación dada. Al cambiar la rigidez del sistema su estructura tendrá mayor resistencia ante el movimiento del motor.
+
+Por otro lado el amortiguamiento proporcional discrimina según la frecuencia. Lo que puede estar sucediendo al momento de cambiar las dimensiones de la viga es que cambiamos cual espectro de frecuencias domina. En las zonas de amplitud máxima puede ser que dominen las frecuencias cercanas a $\omega_{\mathrm{exc}}$ mientras que en los valles la rigidez de las vigas en conjunto es lo suficientemente diferente para que cambie el modo de deformación.
+
+Vale la pena destacar que no tiene mucho sentido imponer un desplazamiento fijo al motor ya que esto implica el aumento violento de fuerzas en las vigas del basamento a medida que se les aumenta la rigidez. Dicha excitación podría ser mejor modelada con una aceleración sobre la masa puntual.
+
+Se elige entonces una viga rectangular $h=6,5\si{\milli \meter}$ y $b=8\si{\milli \meter}$
+
+
+\begin{figure}[htb!]
+	\centering
+	\begin{subfigure}{0.47\textwidth}
+		\includegraphics[width=\linewidth]{fig/amplitudVshb.eps}
+		\caption{Amplitud en función de las dimensiones $h$ y $b$ de la viga considerando desplazamiento $d=10$mm. Amarillo es mayor, azul es menor.}
+		\label{fig:amplitudVshb}
+	\end{subfigure}
+\hfill
+	\begin{subfigure}{0.5\textwidth}
+		\includegraphics[width=\linewidth]{fig/amplitudVshbPropRefinado.eps}
+		\caption{Amplitud en función de las dimensiones $h$ y $b$ de la viga en un análisis modal considerando una fuerza constante. Amarillo es mayor, azul es menor.}
+		\label{fig:amplitudVshbProp}
+	\end{subfigure}
+\end{figure}
+
+\section{Optimización teórica}
+\textit{Para el siguiente análisis se deja a un lado toda perspectiva económica.}
+
+Dado que los desplazamientos del motor son fijos ($u=10\si{\milli\meter}$) tenemos asegurado que hemos logrado desplazamientos mínimos de entrada. Ahora solo nos falta asegurar la mínima transmisión de carga. Dado que los desplazamientos son fijos, aumentar la rigidez aumenta las cargas sufridas por el motor. Podríamos intentar optimizar el problema variando dimensiones de las vigas, aunque hay una solución mucho más elegante para este caso particular. El autor ofrece la siguiente solución.
+
+
+Después de un análisis profundo se opta por montar el motor sobre \textbf{humo}. Así es, puro humo obtenido en cualquier asado el domingo. Se toma las propiedades del humo como las de aire a CNPT.
+
+Propiedades del humo: Datos discretos obtenidos de Engineering Toolbox. Correlación calculada usando \verb|nlinfit| en \Matlab. Error relativo es menor a 0,006\% para todas las formulas en el rango dado usando los coeficientes mostrados. Unidades estándares (SI).
+
+\begin{align*}
+\beta_\air &\approx 0,0037-\num{1,43e-5}T+\num{6,58e-8}T^2 \qquad T\in [-80,40]\celsius \\
+\rho_\air &\approx  \num{2,22e-5}T^2-0,0049T+1,29\qquad T\in [-80,40]\celsius \\
+k_\air &\approx 0,0241 + \num{7.98e-5}T-\num{3,84e-8}T^2 \qquad T\in [-100,100]\celsius \\
+\mu_\air &\approx \num{1,72}{-5} +\num{5e-8}T-\num{4,34e-11}T^2\qquad T\in [-100,100]\celsius \\
+c_{p_\air} &\approx 1004 + 0,0385T-\num{2,63e-4}T^2 \qquad T\in [-100,100]\celsius \\
+\mathrm{Pr}_\air &\approx 0,716 -\num{2,61e-4}T  \qquad T\in [-100,100]\celsius
+\end{align*}
+
+Gracias a este material novedoso que, para nuestra aplicación, no toma cargas en tracción tenemos asegurado que las únicas cargas transmitidas van a ser por radiación sonora. Estas son ínfimas comparadas a las cargas presentes si se fuera a usar un material solido. Se puede incluso instalar el motor en vacío para disminuir estas por completo, pero no sería favorable del punto de vista térmico. Se agrega como otra posibilidad contemplada era de mandar fruta como el soporte en vez de humo, pero que esto le suma complejidad porque habría que analizar cada fruta en especifico para ver que sus propiedades sean las adecuadas para el caso.
+
+
+
+\clearpage
+\part{Viga Empotrada}
+
+\setcounter{section}{0}
+\section{Problema}
 Hallar para el problema descrito en la figura \ref{fig:enunciado}:
 \begin{itemize}
 	\item Frecuencias Naturales
@@ -163,7 +296,7 @@ Luego se busca la respuesta armónica del sistema ante la carga conocida. Se pro
 \begin{equation} \label{eq:Zmodal}
 	 \Cme{\boldsymbol{\ddot{\mathrm{Z}}}}+2\COmega \Cme{C\modal} \Cme{\boldsymbol{\dot{\mathrm{Z}}}} + \COmega^2 \Cme{Z} = \Cme{R\modal}
 \end{equation}
-cuya resolción resulta en 
+cuya resolución resulta en 
 \begin{equation}
 	\Cme{Z} = \frac{\Cme{R\modal }}{{\COmega}^2 \sqrt{(1-\chi^2)^2 + (2 \Cme{C\modal} \chi)^2}}
 \end{equation}
@@ -247,37 +380,6 @@ Se informa al lector el hallazgo de la frecuencias naturales. Dichas frecuencias
 A medida que la frecuencia de excitación aumenta la \textit{amplitud del sistema disminuye}\footnote{Excepto en cercanías de una frecuencia natural} (ver figura \ref{fig:sinesweepmodal}). Es interesante pensar que si aumentara no tendría sentido buscar las frecuencias naturales porque estas son caracterizadas por un máximo de amplitud. Las curvas del barrido de frecuencia son decrecientes en lejanía de una frecuencia natural porque para una fuerza cíclica $F(t)=F_0\sin \omega t$ el tiempo que actúa en una dirección es inversamente proporcional a la frecuencia. Por ende la estructura no tiene tiempo para moverse lejos antes de que se invierta la dirección de la fuerza.
 
 El efecto del amortiguamiento es reducir la amplitud cerca de la frecuencia natural. En la figura \ref{fig:sinesweepmodal} se puede apreciar el efecto claramente. Las siguientes dos figuras (\ref{fig:sinesweepprop1} y \ref{fig:sinesweepprop2}) tienen un nivel agregado de profundidad. Se estudia el efecto la \textit{fracción de amortiguamiento crítico} \cite{cook2007concepts} cuando se varía el amortiguamientos de los puntos borde del espectro de diseño. Como es de esperar para un valor mayor $\dampfact_1$ se amortiguarán a frecuencias más bajas sin afectar las de alta. De forma complementaria, si se aumenta $\dampfact_2$ la amplitud de la primera frecuencia natural no se ve afectada mientras que a frecuencias más altas se reduce la amplitud considerablemente.
-
-\part{Estudio de Motor}
-\section{Introducción}
-Intro blabla
-
-\textbf{Problema}
-\begin{itemize}
-	\item Se precisa proponer un modelo para la estructura y representar gráficamente.
-	\item Efectuar análisis modal y dimensionar las vigas del basamento.
-	\item Proponer un diseño alternativo superador teórico dejando de lado la perspectiva económica. Este diseño debe reducir cargas transmitidas y los desplazamientos del equipo.
-\end{itemize}
-
-
-
-\begin{figure}[htb!]
-	\centering
-	\includegraphics[width=0.6\textwidth]{fig/modelomotor.eps}
-	\caption{Modelo del motor.}
-	\label{fig:modelomotor}
-\end{figure}
-
-\section{Método}
-
-Elementos usados
-\begin{itemize}
-	\item Elemento masa 0D para masa puntual (sin rigidez)
-	\item Elementos viga Timoshenko con masa consistente para basamento
-	\item Elementos Barra simples para Rigid links con rigidez $\num{1e8}$ \si{\newton \per \meter} con matriz de masa nula
-	\item Elemento CBUSH para bulones (nodos azules) con rigidez longitudinal de bulon $k_b$ en direccion $z$ y rigidez $\frac{k_b}{10}$ en $x$ e $y$ para representar el efecto de separar el motor del doble fondo con una resina.
-\end{itemize}
-
 
 \bibliography{labibliografia} % Indica archivo
 \bibliographystyle{plainnat} 

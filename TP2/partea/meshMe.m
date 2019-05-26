@@ -61,5 +61,4 @@ while keepGoing
     lastTop = Nnod+2;
     x=xnext;
 end
-close all
-Draw_Barra(elementos,nodos,'k')
+
