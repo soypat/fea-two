@@ -11,6 +11,7 @@ elementos = [1 2];
 Nelem = size(elementos,1);
 Nnod = size(nodos,1);
 dof = Nnod*2;
+anguloBeta=atand(.4/1)
 
 n2d = @(n) [n*2-1 n*2];
 elemDof = [n2d(elementos(:,1)) n2d(elementos(:,2))];
