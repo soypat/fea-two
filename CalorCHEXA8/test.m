@@ -3,7 +3,10 @@ clc
 
 funcforma
 
-Ndofpornod = 3; % x y z
+nodos = unod*.4;
+elementos = 1:8;
+
+Ndofpornod = 1; % T
 [Nnod, Ndim]     =     size(nodos);
 [Nelem, Nnodporelem] = size(elementos);
 Ndofporelem  =  Ndofpornod*Nnodporelem;
@@ -13,15 +16,6 @@ DOF = reshape(1:dof,Ndofpornod,[])';
 %% Material
 E=200e3;
 nu=.3;
-%% Relacion constitutiva isótropa elastica
-lambda = E*nu/(1+nu)/(1-2*nu);
-G = E/(2+2*nu);
-C = [lambda+2*G lambda lambda 0 0 0; %Relacion constitutiva 3D
-     lambda lambda+2*G lambda 0 0 0;
-     lambda lambda lambda+2*G 0 0 0;
-        0     0     0     G    0  0;
-        0     0     0     0    G  0;
-        0     0     0     0    0  G];
 
 %% Punto Gauss con método acelerado de calculo
 [wpg, upg, npg] = gauss([2 2 2]); % Ver tabla 6.8-1 Cook
@@ -54,3 +48,16 @@ for e = 1:Nelem
     meindof = reshape(DOF(index,:)',1,[]);
     K(meindof,meindof)=K(meindof,meindof)+Ke;
 end
+
+
+
+
+%% Relacion constitutiva isótropa elastica
+% lambda = E*nu/(1+nu)/(1-2*nu);
+% G = E/(2+2*nu);
+% C = [lambda+2*G lambda lambda 0 0 0; %Relacion constitutiva 3D
+%      lambda lambda+2*G lambda 0 0 0;
+%      lambda lambda lambda+2*G 0 0 0;
+%         0     0     0     G    0  0;
+%         0     0     0     0    G  0;
+%         0     0     0     0    0  G];

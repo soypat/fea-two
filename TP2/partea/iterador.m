@@ -1,10 +1,10 @@
-
 %% PROBLEM
 LargoMotor = 5.719;
 % Modifiables
 AB = [1.8 1.8];
 longE = LargoMotor/4*ones(3,1)';%[1.2 2.95 ] %E1, E2, E3
-omegaexc = 600/10*2*pi;
+rpmexc = 600;
+omegaexc = rpmexc/60*2*pi;
 Lelemax=.1; %Longitud máxima de elementos
 
 hv = 0.015:.005:0.15;

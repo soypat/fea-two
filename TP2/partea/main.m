@@ -3,7 +3,8 @@ LargoMotor = 5.719;
 % Modifiables
 AB = [1.8 1.8];
 longE = LargoMotor/4*ones(3,1)';%[1.2 2.95 ] %E1, E2, E3
-omegaexc = 600/10*2*pi;
+rpmexc = 600;
+omegaexc = rpmexc/60*2*pi;
 Lelemax=5; %Longitud máxima de elementos
 h=.06;
 b= .04;
@@ -17,8 +18,8 @@ CG = [1.855 ancho/2 1];
 %% Mesheador del basamento
 meshMe
 close all
-Draw_Barra(elementos,nodos,'k')
-title('Basamento')
+% Draw_Barra(elementos,nodos,'k')
+% title('Basamento')
 %% Mesheo masa
 nodos = [nodos;CG];
 Nnod = size(nodos,1);
@@ -73,10 +74,10 @@ for e = 1:Nrojo %Unimos barras a la masa, para sustituir lo que seria un rigid l
     isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar su muerte
     end
 end
-Draw_Barra(rigidElementos,nodos(:,[1 3 2]),'k')
-title('Rigid Links plano xz')
-Draw_Barra(rigidElementos,nodos(:,[1 2 3]),'k')
-title('Rigid Links plano xy')
+% Draw_Barra(rigidElementos,nodos(:,[1 3 2]),'k')
+% title('Rigid Links plano xz')
+% Draw_Barra(rigidElementos,nodos(:,[1 2 3]),'k')
+% title('Rigid Links plano xy')
 %% Acoplo masa puntual
 masapuntual = 1e6*blkdiag(.055, .055, .055, 0.49, 0.28455,0.28455);
 storeTo = n2d6(masa);
@@ -103,13 +104,17 @@ isFree=~isFixed;
 Kr = K(isFree,isFree);
 Mr = M(isFree,isFree);
 %% Busco Fuerzas para causar desplazamientos iniciales
-D0 = zeros(dof,1);
-
-Dmasa = [0 0 10e-3 0 0 0]; % se mueve 10mm en y
+dmasa = 10e-3;
+% DEMOSTRACION:
+% a = d^2x/dt^2 -> x = dmasa*sin(omegaexc*t) -> v = dmasa*omegaexc*cos(o*t)
+% a = - dmasa*omegaexc^2 * sin(omegaexc*t) -> Fmax = dmasa*omegaexc^2 *masa
+F0 = dmasa* omegaexc^2 * masapuntual(1,1);
+Fmasa = [0 0 F0 0 0 0]; % se mueve 10mm en z
 storeTo = n2d6(masa);
-D0(storeTo) = Dmasa;
-
-Rr = Kr*D0(isFree);
+R = zeros(dof,1);
+R(storeTo) = Fmasa;
+Rr = R(isFree);
+% Dr = Kr\Rr;
 
 resonance
 

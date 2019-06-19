@@ -1,4 +1,3 @@
-% No-modificables
 rojoX = [417 667 1197 1727 2257 2787 3317 3847 4377 4907 5437]'/1000;
 
 ancho = 1.93;
@@ -93,15 +92,14 @@ isFree=~isFixed;
 Kr = K(isFree,isFree);
 Mr = M(isFree,isFree);
 %% Busco Fuerzas para causar desplazamientos iniciales
-D0 = zeros(dof,1);
-
-Dmasa = [0 0 10e-3 0 0 0]; % se mueve 10mm en y
+dmasa = 10e-3;
+F0 = dmasa* omegaexc^2 * masapuntual(1,1);
+Fmasa = [0 0 F0 0 0 0]; % se mueve 10mm en z
 storeTo = n2d6(masa);
-D0(storeTo) = Dmasa;
+R = zeros(dof,1);
+R(storeTo) = Fmasa;
+Rr = R(isFree);
 
-% Rr = Kr*D0(isFree);
-Rr = zeros(size(Kr,1),1);
-Rr(n2d3(masa)) = [0 0 4000]';
 resonance
 
 
