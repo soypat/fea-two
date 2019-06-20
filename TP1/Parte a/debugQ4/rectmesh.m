@@ -22,6 +22,7 @@ Nelem = xelem*yelem;
 elementos = zeros(Nelem,Nnodporelem);
 for ey = 1:yelem
     for ex = 1:xelem
+        
         elemplace = ex+xelem*(ey-1);
         firstnode = ex+divx*(ey-1);
         index = [firstnode firstnode+1 firstnode+divx+1 firstnode+divx];
