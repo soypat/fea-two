@@ -1,6 +1,6 @@
 
 Ndofpornod = 2;
-Nelem = 8;
+Nelem = 1;
 L=.5; % 0.5 metros % TODO UNIDADES ESTANDAR
 [nodos3d,elementos,elemDof]=meshViga([0 0 0],[L 0 0],Nelem,Ndofpornod,1);
 nodos = nodos3d(:,[1 2]);
@@ -41,12 +41,14 @@ for e=1:Nelem
     Mg(storeTo,storeTo) = Mg(storeTo,storeTo) + Me;
 end
 
-K = Kg(isFree,isFree);
-M = Mg(isFree,isFree);
+
 
 isFixed = false(dof,1);
 isFixed([1 2]) = true; % Primer nodo empotrado
 isFree = ~isFixed;
+K = Kg(isFree,isFree);
+M = Mg(isFree,isFree);
+
 dofred = sum(isFree);
 A = Mg(isFree,isFree)\Kg(isFree,isFree); %F de frecuencia
 [Vr, eigVal] = eig(A);
@@ -58,51 +60,54 @@ for i = 1:dofred
    Phii = Phi(:,i); 
    omega(i) = sqrt(Phii'* Kg(isFree,isFree)*Phii); % Idem
 end
-alpha = 1;
-beta = 3;
-C = alpha*eye(dofred)+beta*eigVal;
+alpha = 0.02;
+beta = 0.0002%.1;
+C = alpha*M+beta*K;
 % cmod=Phi'*(alpha*Mr+beta*Kr)*Phi
 
-dt = 1/max(omega); %segundos CONDICION: dt <= 2/max(omega)
+dt = 1/max(omega)/5000; %segundos CONDICION: dt <= 2/max(omega)
 dtdiv2 = dt/2;
 dtdiv6 = dt/6;
-Nt = 5e2; % 10 segundos simulados
-Minv = inv(Mg(isFree,isFree));
-Kinv = inv(Kg(isFree,isFree));
+Nt = 2e7; % 10 segundos simulados
+% Minv = inv(Mg(isFree,isFree));
+% Kinv = inv(Kg(isFree,isFree));
 %% Cargas
 Rext = zeros(dof,1);
 Rext2 = zeros(dof,1);
 q=1;
-freqCarga = 10; %Hz
+freqCarga = 1000; %Hz
 
 V = zeros(dofred,1); % Condicion inicial: velocidad = 0
+V(end-1) = 5;
 D = zeros(dofred,1); % desplazamientos = 0
 D_t = zeros(dofred,Nt);
 for i = 0:Nt
     t = dt*i; %tiempo
-    if t<=dt*100
+    if true %t<=dt*100
+        Rext(end)=0;%q*sin(freqCarga*t*2*pi+eps);%20kN
+        Rext2(end)=0; %q*sin(freqCarga*(t+dtdiv2)*2*pi);%20kN
+    else
 %         Rext(end)=0;
 %         Rext2(end)=0;%20kN
-        Rext(end)=q*sin(freqCarga*t*2*pi);%20kN
-        Rext2(end)=q*sin(freqCarga*(t+dtdiv2)*2*pi);%20kN
-    else
-        Rext(end)=0;
-        Rext2(end)=0;%20kN
     end
-    k1V = M\(Rext(isFree)-C*V-K*D);
-    k1D = V;
-    
-    k2V = M\(Rext2(isFree)-C*(V+dtdiv2*k1V)-K*(D+dtdiv2*k1D));
-    k2D = V+dtdiv2*k1V;
-    
-    k3V = M\(Rext2(isFree) - C*(V+dtdiv2*k2V)-K*(D+dtdiv2*k2D));
-    k3D = V+dtdiv2*k2V;
-    
-    k4V = M\(Rext(isFree)-C*(V+dt*k3V)-K*(D+dt*k3D));
-    k4D = V+dt*k3V;
-    
-    Vnxt = V + dtdiv6*(k1V+2*(k2V+k3V)+k4V);
-    Dnxt = D + dtdiv6*(k1D+2*(k2D+k3D)+k4D);
+    %Integracion explicita
+     Vnxt = V + dtdiv2*(M\(Rext(isFree)-C*V-K*D));
+     Dnxt = D + dtdiv2*(V);
+     % Integracion directa
+%     k1V = M\(Rext(isFree)-C*V-K*D);
+%     k1D = V;
+%     
+%     k2V = M\(Rext2(isFree)-C*(V+dtdiv2*k1V)-K*(D+dtdiv2*k1D));
+%     k2D = V+dtdiv2*k1V;
+%     
+%     k3V = M\(Rext2(isFree) - C*(V+dtdiv2*k2V)-K*(D+dtdiv2*k2D));
+%     k3D = V+dtdiv2*k2V;
+%     
+%     k4V = M\(Rext(isFree)-C*(V+dt*k3V)-K*(D+dt*k3D));
+%     k4D = V+dt*k3V;
+%     
+%     Vnxt = V + dtdiv6*(k1V+2*(k2V+k3V)+k4V);
+%     Dnxt = D + dtdiv6*(k1D+2*(k2D+k3D)+k4D);
     if sum(isnan(Dnxt))>0
         error('NaN found in solve')
     end 
@@ -111,14 +116,16 @@ for i = 0:Nt
     V = Vnxt;
 end
 
-pos = zeros(size(nodos));
-D = zeros(dof,1);
-for i=1:Nt
-    D(isFree) = D_t(:,i);
-    pos(:,1)=nodos(:,1)+D(1:2:end);
-    pos(:,2)=nodos(:,2)+D(2:2:end);
-    
-    scatter(pos(:,1),pos(:,2),'*k')
-    drawnow
-    
-end
+plot(D_t(end-1,:),'b.')
+
+% pos = zeros(size(nodos));
+% D = zeros(dof,1);
+% for i=1:Nt
+%     D(isFree) = D_t(:,i);
+%     pos(:,1)=nodos(:,1)+D(1:2:end);
+%     pos(:,2)=nodos(:,2)+D(2:2:end);
+%     
+%     scatter(pos(:,1),pos(:,2),'*k')
+%     drawnow
+%     
+% end

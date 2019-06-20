@@ -7,8 +7,8 @@ rpmexc = 600;
 omegaexc = rpmexc/60*2*pi;
 Lelemax=.1; %Longitud máxima de elementos
 
-hv = 0.015:.005:0.15;
-bv = 0.015:.005:0.15;
+hv = 0.015:.005:0.08;
+bv = 0.015:.005:0.08;
 Nh = length(hv);
 Nb = length(bv);
 
@@ -19,16 +19,21 @@ AModhb = zeros(Nh,Nb);
 AProphb = zeros(Nh,Nb);
 Secchb = zeros(Nh,Nb);
 
+l = waitbar(0,'Beginning iteration');
+Ntotal = Nh*Nb;
+
 for h = hv 
     for b = bv
         mainiterable
         AModhb(ih,ib) = AmpMod;
         AProphb(ih,ib) = AmpProp;
         Secchb(ih,ib) = h*b;
-        ib=ib+1; 
+        ib=ib+1;
+        waitbar(((ih+1)*Nb+ib)/Ntotal,l)
     end
     ib=1;
     ih=ih+1;
+    waitbar(((ih+1)*Nb+ib)/Ntotal,l,sprintf('%0.0f',h))
 end
 close all
 [Xh ,Yb] = meshgrid(hv,bv);

@@ -46,7 +46,8 @@ C = [lambda+2*G lambda lambda 0 0 0; %Relacion constitutiva 3D
         0     0     0     G    0  0;
         0     0     0     0    G  0;
         0     0     0     0    0  G];
- 
+    
+    
     f=2+2*nu;
 Cinv = [1 -nu -nu 0 0 0;
     -nu 1 -nu 0 0 0;

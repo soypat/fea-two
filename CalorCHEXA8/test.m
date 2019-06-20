@@ -16,6 +16,9 @@ DOF = reshape(1:dof,Ndofpornod,[])';
 %% Material
 E=200e3;
 nu=.3;
+k=30;%W/m/K
+C = [k -k
+     -k k];
 
 %% Punto Gauss con método acelerado de calculo
 [wpg, upg, npg] = gauss([2 2 2]); % Ver tabla 6.8-1 Cook
