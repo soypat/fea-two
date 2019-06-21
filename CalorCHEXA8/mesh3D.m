@@ -1,4 +1,4 @@
-function [nodos,elementos] = mesh3D(X,div)
+function [nodos,elementos,AdinaElem] = mesh3D(X,div)
 %makes 3D mesh for H8 element - patty got u covered
 % X = [x1 x2; y1 y2; z1 z2];
 if sum(div<=1)>0
@@ -28,14 +28,17 @@ Nnodpelem = 8;
 
 Nelem = prod(dElem);
 elementos = zeros(Nelem,Nnodpelem);
+AdinaElem=elementos;
 xyTot = div(1)*div(2);
 e=1;
+indexToAdina = [1 4 3 2 5 8 7 6];
 for ez = 1:dElem(3)
 for ey = 1:dElem(2)
 for ex = 1:dElem(1)
         firstnode = ex+div(1)*(ey-1)+(ez-1)*div(1)*div(2);
         znod = (xyTot+firstnode);
         index = [firstnode firstnode+1 firstnode+div(1)+1 firstnode+div(1) znod znod+1 znod+div(1)+1 znod+div(1)];
+        AdinaElem(e,:)=index(indexToAdina);
         elementos(e,:)=index;
         e=e+1;
 end
