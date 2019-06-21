@@ -128,7 +128,6 @@ for e = 1:Nelem
                 
                 Tupg = T(index)'*Ns{ipg}'; %interpolacion
                 r = r-Ns{ipg}(supnod(s,:))'*boltz*(Tupg^4 - Trad)*det(J)*wpg(ipg);
-                
             end
             Rrad(supindex)=Rrad(supindex)+r;
         end
