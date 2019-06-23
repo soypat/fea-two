@@ -5,10 +5,10 @@ AB = [1.8 1.8];
 longE = LargoMotor/4*ones(3,1)';%[1.2 2.95 ] %E1, E2, E3
 rpmexc = 600;
 omegaexc = rpmexc/60*2*pi;
-Lelemax=.1; %Longitud máxima de elementos
+Lelemax=.2; %Longitud máxima de elementos
 
-hv = 0.015:.005:0.08;
-bv = 0.015:.005:0.08;
+hv = 0.025:.005:0.09;
+bv = 0.025:.005:0.09;
 Nh = length(hv);
 Nb = length(bv);
 
@@ -16,6 +16,7 @@ Niter=Nh*Nb;
 ih = 1;
 ib = 1;
 AModhb = zeros(Nh,Nb);
+Shb = zeros(Nh,Nb);
 AProphb = zeros(Nh,Nb);
 Secchb = zeros(Nh,Nb);
 
@@ -24,17 +25,19 @@ Ntotal = Nh*Nb;
 
 for h = hv 
     for b = bv
+        waitbar(((ih-1)*Nb+ib)/Ntotal,l,sprintf('h=%0.3f[m]',h))
         mainiterable
+        Shb(ih,ib) = maxsig;
         AModhb(ih,ib) = AmpMod;
         AProphb(ih,ib) = AmpProp;
         Secchb(ih,ib) = h*b;
         ib=ib+1;
-        waitbar(((ih+1)*Nb+ib)/Ntotal,l)
     end
     ib=1;
     ih=ih+1;
-    waitbar(((ih+1)*Nb+ib)/Ntotal,l,sprintf('%0.0f',h))
+%     waitbar(((ih)*Nb+ib)/Ntotal,l,sprintf('h=%0.3f',h))
 end
+close(l)
 close all
 [Xh ,Yb] = meshgrid(hv,bv);
 figure(1)
@@ -54,6 +57,12 @@ ylabel('b [m]')
 figure(3)
 surf(Xh,Yb,AModhb./Secchb)
 title('Seccion en funcion de h y b')
+xlabel('h [m]')
+ylabel('b [m]')
+
+figure(4)
+surf(Xh,Yb,Shb)
+title('Tension cuasiestatica en funcion de h y b')
 xlabel('h [m]')
 ylabel('b [m]')
 

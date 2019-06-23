@@ -151,7 +151,7 @@ Debido a este último punto es de sumo interés conocer la frecuencia natural de
 \end{figure}
 
 \section{Método}
-El problema se resuelve en \Matlab utilizando el método de elementos finitos.
+El problema se resuelve en \Matlab{} utilizando el método de elementos finitos.
 
 Elementos usados
 \begin{itemize}
@@ -191,7 +191,7 @@ donde $b$ es el lado corto y $h$ el lado largo.
 \end{figure}
 
 \subsection*{Selección de parámetros}
-Para un primer análisis se fijaron las distancias entre los bulones de tal forma como para que tengan el mismo espacio entre ellos. Se optó por aplicar el mismo criterio para la posición de los soportes en $y$.
+Para un primer análisis se fijaron las distancias entre los bulones de tal forma como para que tengan el mismo espacio entre ellos. Se resuelve el problema para solicitaciones cuasiestáticas (peso de motor) para obtener la optima posición de los soportes en $y$.
 
 
 \begin{table}[htb!]
@@ -199,23 +199,24 @@ Para un primer análisis se fijaron las distancias entre los bulones de tal form
 	\begin{tabular}{lllll}
 		& 1 & 2 & 3 & 4 \\ \hline
 		Uniones Abulonadas& 0,097 \si{\meter}  & 1,897 \si{ \meter} & 3,697 \si{ \meter} & 5,567 \si{ \meter} \\
-		Soportes en $y$& 1,5268 \si{\meter}  &2,9565\si{\meter}   & 4.3863 \si{\meter}  &  \\
+		Soportes en $y$& 0,797 \si{\meter}  &1,787\si{\meter}   & 2,587 \si{\meter}  &  \\
 	\end{tabular}
 \caption{Posición en $x$ de los nodos correspondientes a los bulones que unen doble fondo con basamento y las vigas estructurales en $y$.}
 \end{table}
 
-Para dimensionar las vigas del basamento iteramos variando $h$ y $b$ para todas las vigas. El amortiguamiento del sistema está controlado por la resina en los bulones. Se decidió modelar esto como un amortiguamiento global de $\dampfact = 0,1$ en un análisis con amortiguamiento modal. La excitación $\omega_{\mathrm{exc}}$ es de 600 rpm y se calcula la amplitud de excitación según un desplazamiento de $10$mm sobre la masa puntual en la dirección $z$.
+Para dimensionar las vigas del basamento se comenzó resolviendo el sistema cuasiestático donde la única carga es el peso del motor. Esto dará un rango de dimensiones inicial para trabajar el problema dinamicamente. Luego del dimensionado cuasiestático (todas las vigas tienen las mismas dimensiones para simplificar el problema) iteramos variando $h$ y $b$ para todas las vigas. El amortiguamiento del sistema está controlado por la resina en los bulones. Se decidió modelar esto como un amortiguamiento global de $\dampfact = 0,1$ en un análisis con amortiguamiento modal. La excitación $\omega_{\mathrm{exc}}$ es de 600 rpm y se calcula la amplitud de excitación según un desplazamiento de $10$mm sobre la masa puntual en la dirección $z$.
 
 Por último se va efectuar un análisis con amortiguamiento proporcional usando la primer frecuencia natural del sistema como $\omega_1$ y $\omega_2 = 1,15 \omega_{\mathrm{exc}}$. Se amortiguan estos modos con $\dampfact_{1}=0,06$ y $\dampfact_2=0,2$, respectivamente. El desarrollo de esta formulación queda detallada en la parte B de este informe. 
 
 \section{Resultados del dimensionamiento}
+
 Se ve una diferencia importante en la suavidad entre las superficies que representan la amplitud en función de $h$ y $b$ según el tipo de amortiguamiento usado. Sin embargo, ambas tienen una interpretación concreta.
 
 El amortiguamiento modal impone un amortiguamiento global. Esto implica que todo el espectro de frecuencias naturales entra en juego para una excitación dada. Al cambiar la rigidez del sistema su estructura tendrá mayor resistencia ante el movimiento del motor.
 
-Por otro lado el amortiguamiento proporcional discrimina según la frecuencia. Lo que puede estar sucediendo al momento de cambiar las dimensiones de la viga es que cambiamos cual espectro de frecuencias domina. En las zonas de amplitud máxima puede ser que dominen las frecuencias cercanas a $\omega_{\mathrm{exc}}$ mientras que en los valles la rigidez de las vigas en conjunto es lo suficientemente diferente para que cambie el modo de deformación.
+Por otro lado el amortiguamiento proporcional discrimina según la frecuencia. Lo que puede estar sucediendo al momento de cambiar las dimensiones de la viga es que cambiamos cual frecuencia natural domina. En las zonas de amplitud máxima puede ser que dominen las frecuencias cercanas a $\omega_{\mathrm{exc}}$ mientras que en los valles la rigidez de las vigas en conjunto es lo suficientemente diferente para que cambie el modo de deformación.
 
-Vale la pena destacar que no tiene mucho sentido imponer un desplazamiento fijo al motor ya que esto implica el aumento violento de fuerzas en las vigas del basamento a medida que se les aumenta la rigidez. Dicha excitación podría ser mejor modelada con una aceleración sobre la masa puntual.
+
 
 Se elige entonces una viga rectangular $h=6,5\si{\milli \meter}$ y $b=8\si{\milli \meter}$
 
@@ -229,10 +230,17 @@ Se elige entonces una viga rectangular $h=6,5\si{\milli \meter}$ y $b=8\si{\mill
 	\end{subfigure}
 \hfill
 	\begin{subfigure}{0.5\textwidth}
-		\includegraphics[width=\linewidth]{fig/amplitudVshbPropRefinado.eps}
-		\caption{Amplitud en función de las dimensiones $h$ y $b$ de la viga en un análisis modal considerando una fuerza constante. Amarillo es mayor, azul es menor.}
+		\includegraphics[width=\linewidth]{fig/amplitudVshbProp.eps}
+		\caption{Amplitud en función de las dimensiones $h$ y $b$ de la viga en un análisis modal considerando una fuerza constante. Amarillo es mayor, azul es menor. Longitud de elemento caracteristica $L_e=0,1$m.}
 		\label{fig:amplitudVshbProp}
 	\end{subfigure}
+\end{figure}
+
+\begin{figure}
+	\centering
+			\includegraphics[width=0.7\linewidth]{fig/amplitudVshbPropRefinado.eps}
+	\caption{Similar a figura \ref{fig:amplitudVshbProp} pero con refinamiento de elementos global. Longitud de elemento caracteristica $L_e=0,05$m.}
+	\label{fig:amplitudVshbPropref}
 \end{figure}
 
 \section{Optimización teórica}

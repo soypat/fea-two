@@ -1,4 +1,4 @@
-function [Ns,dNs,dNauxs,NLs] = shapefunGP(upg,N,dN,dNaux,NL)
+function [Ns,dNs,dNauxs,NLs] = shapefunGPM(upg,N,dN,dNaux,NL)
 npg=size(upg,1);
 Ns=cell(npg,1);
 dNs = cell(npg,1);

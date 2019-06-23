@@ -2,12 +2,12 @@
 LargoMotor = 5.719;
 % Modifiables
 AB = [1.8 1.8];
-longE = LargoMotor/4*ones(3,1)';%[1.2 2.95 ] %E1, E2, E3
+longE = [.7 .99 .8];%[1.2 2.95 ] %E1, E2, E3
 rpmexc = 600;
 omegaexc = rpmexc/60*2*pi;
 Lelemax=5; %Longitud máxima de elementos
-h=.06;
-b= .04;
+h = .15;
+b = .15;
 
 % No-modificables
 rojoX = [417 667 1197 1727 2257 2787 3317 3847 4377 4907 5437]'/1000;
@@ -113,10 +113,46 @@ Fmasa = [0 0 F0 0 0 0]; % se mueve 10mm en z
 storeTo = n2d6(masa);
 R = zeros(dof,1);
 R(storeTo) = Fmasa;
-Rr = R(isFree);
-% Dr = Kr\Rr;
+Rr=R(isFree);
+%% Cuasiestatico
+Fcuasi = [0 0 -masapuntual(1,1)*9.81 0 0 0];
+Rcuasi = zeros(dof,1);
+Rcuasi(n2d6(masa)) = Fcuasi;
+Dr = Kr\Rcuasi(isFree);
+D = zeros(dof,1);
+D(isFree)=Dr;
+maxsig=0;
 
-resonance
+for e = 1:Nvigas
+    n1 = nodos(elementos(e,1),:);
+    n2 = nodos(elementos(e,2),:);
+    T = Tv(n2-n1,[0 0 1]);
+    [ke, me] = vigastiffness(E,nu,rho,A,Iz,Iy,Jtors,Le);
+    Ke =T*ke*T';
+    Dlocal=D(elemDof(e,:));
+    flocal=ke*T'*Dlocal;
+    Nx =  flocal(1);
+    Vy =  flocal(2);
+    Vz =  flocal(3);
+    Mx1 = flocal(4);
+    My1 = flocal(5);
+    Mz1 = flocal(6);
+    Mx2 = flocal(10);
+    My2 = flocal(11);
+    Mz2 = flocal(12);
+    Mz=max([Mz1 Mz2]);
+    My = max([My1 My2]);
+    A=b*h;
+    sig = Nx/A+abs(Mz*h/(2*Iz));
+    sig2 = Nx/A+abs(My*b/(2*Iy));
+    if maxsig<max([sig,sig2])
+        maxsig=max([sig,sig2]);
+        badel=e;
+    end
+end
+
+
+% resonance
 
 
 

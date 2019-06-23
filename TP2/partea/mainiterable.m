@@ -91,7 +91,7 @@ K = abulonar(azules(:,2),K,[kb kbt kbt]); %Restringo las otras
 isFree=~isFixed;
 Kr = K(isFree,isFree);
 Mr = M(isFree,isFree);
-%% Busco Fuerzas para causar desplazamientos iniciales
+%% Busco Fuerzas para causar desplazamientos iniciales (Dinamico)
 dmasa = 10e-3;
 F0 = dmasa* omegaexc^2 * masapuntual(1,1);
 Fmasa = [0 0 F0 0 0 0]; % se mueve 10mm en z
@@ -99,6 +99,42 @@ storeTo = n2d6(masa);
 R = zeros(dof,1);
 R(storeTo) = Fmasa;
 Rr = R(isFree);
+
+%% Cuasiestatico
+Fcuasi = [0 0 -masapuntual(1,1)*9.81 0 0 0];
+Rcuasi = zeros(dof,1);
+Rcuasi(n2d6(masa)) = Fcuasi;
+Dr = Kr\Rcuasi(isFree);
+D = zeros(dof,1);
+D(isFree)=Dr;
+maxsig=0;
+for e = 1:Nvigas
+    n1 = nodos(elementos(e,1),:);
+    n2 = nodos(elementos(e,2),:);
+    T = Tv(n2-n1,[0 0 1]);
+    [ke, me] = vigastiffness(E,nu,rho,A,Iz,Iy,Jtors,Le);
+    Ke =T*ke*T';
+    Dlocal=D(elemDof(e,:));
+    flocal=ke*T'*Dlocal;
+    Nx =  flocal(1);
+    Vy =  flocal(2);
+    Vz =  flocal(3);
+    Mx1 = flocal(4);
+    My1 = flocal(5);
+    Mz1 = flocal(6);
+    Mx2 = flocal(10);
+    My2 = flocal(11);
+    Mz2 = flocal(12);
+    Mz=max([Mz1 Mz2]);
+    My = max([My1 My2]);
+    A=b*h;
+    sig = Nx/A+abs(Mz*h/(2*Iz));
+    sig2 = Nx/A+abs(My*b/(2*Iy));
+    if maxsig<max([sig,sig2])
+        maxsig=max([sig,sig2]);
+    end
+end
+
 
 resonance
 
