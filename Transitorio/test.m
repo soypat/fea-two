@@ -61,7 +61,7 @@ for i = 1:dofred
    omega(i) = sqrt(Phii'* Kg(isFree,isFree)*Phii); % Idem
 end
 alpha = 0.02;
-beta = 0.0002%.1;
+beta = 0.0002;%.1;
 C = alpha*M+beta*K;
 % cmod=Phi'*(alpha*Mr+beta*Kr)*Phi
 

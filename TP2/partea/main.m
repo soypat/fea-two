@@ -6,8 +6,8 @@ longE = [.7 .99 .8];%[1.2 2.95 ] %E1, E2, E3
 rpmexc = 600;
 omegaexc = rpmexc/60*2*pi;
 Lelemax=5; %Longitud máxima de elementos
-h = .15;
-b = .15;
+h = .09;
+b = .04;
 
 % No-modificables
 rojoX = [417 667 1197 1727 2257 2787 3317 3847 4377 4907 5437]'/1000;
@@ -45,11 +45,11 @@ dof = Nnod*6;
 %% Mass Stiffness Matrices
 K = zeros(dof,dof);
 M = zeros(dof,dof);
+
 for e = 1:Nvigas
     storeTo = elemDof(e,:);
     n1=nodos(elementos(e,1),:);n2=nodos(elementos(e,2),:);
     Le=norm(n2-n1);
-  
     [ke, me] = vigastiffness(E,nu,rho,A,Iz,Iy,Jtors,Le);
     Ke = vigorotar(ke,n1,n2,[0 0 1]);
     Me = vigorotar(me,n1,n2,[0 0 1]);
@@ -58,22 +58,39 @@ for e = 1:Nvigas
     M(storeTo,storeTo) = M(storeTo,storeTo) + Me;
 end
 
-%% ""Rigid Links""
+%% Reemplazo RigidLinks por Rigid Beams
 isFixed = false(dof,1);
 Nrigid = Nrojo*2;
 krigid = 1e8;
 rigidElementos =[];
+[ke,~] = vigastiffness(E*100,nu,rho,A,Iz,Iy,Jtors,.5);
 for e = 1:Nrojo %Unimos barras a la masa, para sustituir lo que seria un rigid link
     for i=1:2
     storeTo = [n2d6(rojos(e)) n2d6(masa)];
     n1=nodos(rojos(e,i),:);n2=nodos(masa,:);
     rigidElementos = [rigidElementos;rojos(e,i) masa];
-    [ke, ~] = vigastiffness(krigid,nu,0,1,0,0,0,1);
     Ke = vigorotar(ke,n1,n2,[0 0 -1]);
     K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
-    isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar su muerte
+%     isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar su muerte
     end
 end
+
+%% ""Rigid Links""
+% isFixed = false(dof,1);
+% Nrigid = Nrojo*2;
+% krigid = 1e8;
+% rigidElementos =[];
+% for e = 1:Nrojo %Unimos barras a la masa, para sustituir lo que seria un rigid link
+%     for i=1:2
+%     storeTo = [n2d6(rojos(e)) n2d6(masa)];
+%     n1=nodos(rojos(e,i),:);n2=nodos(masa,:);
+%     rigidElementos = [rigidElementos;rojos(e,i) masa];
+%     [ke, ~] = vigastiffness(krigid,nu,0,1,0,0,0,1);
+%     Ke = vigorotar(ke,n1,n2,[0 0 -1]);
+%     K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
+%     isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar su muerte
+%     end
+% end
 % Draw_Barra(rigidElementos,nodos(:,[1 3 2]),'k')
 % title('Rigid Links plano xz')
 % Draw_Barra(rigidElementos,nodos(:,[1 2 3]),'k')
@@ -124,6 +141,7 @@ D(isFree)=Dr;
 maxsig=0;
 
 for e = 1:Nvigas
+    
     n1 = nodos(elementos(e,1),:);
     n2 = nodos(elementos(e,2),:);
     T = Tv(n2-n1,[0 0 1]);
@@ -145,7 +163,7 @@ for e = 1:Nvigas
     A=b*h;
     sig = Nx/A+abs(Mz*h/(2*Iz));
     sig2 = Nx/A+abs(My*b/(2*Iy));
-    if maxsig<max([sig,sig2])
+    if maxsig<max([sig,sig2]) && max([sig,sig2])<1e9
         maxsig=max([sig,sig2]);
         badel=e;
     end
