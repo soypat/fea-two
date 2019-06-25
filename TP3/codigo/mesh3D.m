@@ -44,7 +44,7 @@ for ex = 1:dElem(1)
 end
 end
 end
-scatter3(nodos(:,1),nodos(:,2),nodos(:,3))
+% scatter3(nodos(:,1),nodos(:,2),nodos(:,3))
 
 
 end
