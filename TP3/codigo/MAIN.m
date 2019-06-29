@@ -8,7 +8,7 @@ volumen = L*L*L/8;
 %% SOLVE:
 funcforma
 
-div = 11;
+div = 5;
 div2=ceil(9/2);
 
 [nodos, ~,elementos] = mesh3D([0 L/2;0 L/2;0 L/2],[div div div]);
@@ -31,16 +31,16 @@ capTot = cap*volumen; % deberia dar igual que la suma de toda mi matriz capacida
 k=17;%W/m/K
 Kc = [k 0 0 
      0 k 0
-     0 0 k]; %considero material isotropico
+     0 0 k]; %considero material isotropico 3D
 
 %% Punto Gauss con método acelerado de calculo
 [wpg, upg, npg] = gauss([2 2 2]); % Ver tabla 6.8-1 Cook
-[Ns,~,dNauxs,~] = shapefunGP(upg,N,dN,dNaux,NL);
+[Ns,~,dNauxs,~] = shapefunGP(upg,N,dN,dNaux,NL); %Funcion optimizadora
 
 %% Rigidity Assemble and charges
 Kg = zeros(dof,dof);
 Cg = zeros(dof,dof);
-R=zeros(dof,1);
+Rgen=zeros(dof,1);
 wallnod=false(Nnod,1);
 for e = 1:Nelem
     Ke = zeros(Ndofporelem);
@@ -58,7 +58,7 @@ for e = 1:Nelem
         r = r+Ns{ipg}'*Q*wpg(ipg)*det(J);
     end
     meindof = reshape(DOF(index,:)',1,[]);
-    R(meindof) = R(meindof)+r; %cargas térmicas por generacion
+    Rgen(meindof) = Rgen(meindof)+r; %cargas térmicas por generacion
     Cg(meindof,meindof)=Cg(meindof,meindof)+Ce;
     Kg(meindof,meindof)=Kg(meindof,meindof)+Ke;
 end
@@ -87,90 +87,95 @@ for n=1:Nnod
     end
 end
 intnod= find(interiornod);
-
-Rgen = R;
 K = Kg;
 C= Cg;
-%% Resuelvo Condiciones iniciales
-Ts = 2.7;
+R = zeros(dof,1);
+Rk = zeros(dof,1);
 T = zeros(dof,1);
-cc = wallnod;
-% T(interiornod)=(Ts+300)/2;
-T(cc) = Ts;
+
+%% Condiciones de borde
+
+cc=false(dof,1);
+% cc = wallnod;
 cc(medio)=true;
-T(medio) = 300; %K condicion de borde
 xx = ~cc;
-Tx = K(xx,xx)\(R(xx)-K(xx,cc)*T(cc));
-Qx = K(cc,xx)*Tx+K(cc,cc)*T(cc);
-R(cc)=Qx;
-T(xx)=Tx;
+% T(interiornod)=(Ts+300)/2;
+T(medio) = 300; %K condicion de borde
+Tlast = T;
+
+
+R(xx)=Rgen(xx);
+T(xx)=60;
 
 %% LAST RESOLUTION
 % v = load('Tf.mat');
 % T = v.T;
-%% Transitorio
-dt = 150;
-t_tot = 100000;
-Nt = ceil(t_tot/dt);
+%% Iteracion para llegar a regimen estacionario (estado estable)
+
 prepRad
-dtdiv2=dt/2;
-beta=0.5;
 keepGoing=true;
 i=1;
-iterskip=30;
+
+beta =1; %futuro=1, pasado=0
+
+Rradlast=zeros(dof,1);
+% Area radiativa es 0.48m^2
 while keepGoing
-    tiempo = i*dt;
+%     for j = 1:raditer
+%         radiacion
+%         R = Rgen+Rrad*beta+(1-beta)*Rradlast;
+%         Rradlast=Rrad;
+%         T(xx) = K(xx,xx)\(R(xx)-K(xx,cc)*T(cc));
+%     end
+% comun
     radiacion
-    Rnxt = Rgen+Rrad;
-    if beta == 0
-        Tnxt = C\((C-dt*K)*T + dt*R );
-    elseif beta==.5
-        Tnxt = (C+dtdiv2*K)\((C-dtdiv2*K)*T + dtdiv2*(R+Rnxt ));
-    else
-        Tnxt = (C+beta*dt*K)\((C-dt*(1-beta)*K)*T + dt*((1-beta)*R+beta*Rnxt));
-    end
-%     norm(T-Tnxt)/norm(T)
-    if norm(T-Tnxt)/norm(T) <1e-8 && i>20
+    R=Rgen +Rrad*(1-beta);
+    Rradlast=Rrad;
+    T(xx) = K(xx,xx)\(R(xx)-K(xx,cc)*T(cc));
+    radiacion
+    R=Rgen+Rrad*beta +Rradlast*(1-beta);
+    T(xx) = K(xx,xx)\(R(xx)-K(xx,cc)*T(cc));
+    
+    if norm(Tlast-T)/norm(Tlast) <1e-8 && i>20
         warning('Ending simulation. error low')
         keepGoing=false;
-    elseif mod(i,iterskip)==0
-        scatter(dt*i,T(intnod(end)),'r.')
+    elseif mod(i,1)==0
+        Tin = T(interiornod);
+        scatter(i,Tin(end),'r.')
         hold on
-        scatter(dt*i,T(1),'b.')
+        scatter(i,T(1),'b.')
         hold on
         drawnow
     end
+    Tlast = T;
     
-    T = Tnxt;
     T(medio)=300;
-    if isnan(T(62))
+    if isnan(T(wallnod(1)))
         error('NAN FOUND!')
         break
     end
-    R = Rnxt;
-
-%     drawnow
     i=i+1;
 end
-return
+
 title(sprintf('Convergencia con %0.0f elementos',Nelem))
 ylabel('Temperatura [K]')
-xlabel('Tiempo [s]')
+xlabel('Iteracion')
 legend('T_i','T_s')
 grid on
-
+figure(2)
 plot(xv,T(xnv),'k--^')
 title('Perfil de temperaturas Centro-Superficie')
 xlabel('x [m]')
 ylabel('Temperatura [K]')
 grid on
 
-
+figure(3)
 plot(wz,T(wn),'m--s')
 title('Perfil de temperaturas a lo largo de superficie')
 ylabel('Temperatura [K]')
 xlabel('Posicion sobre superficie [m]')
 grid on
+figure(4)
 plot(wz,boltz*(T(wn)-2.7^4),'b--x')
 title('Calor intercambiado de la superficie con el espacio')
 ylabel('Calor radiado por unidad de area [W/m^2]')

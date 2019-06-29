@@ -1,6 +1,4 @@
-
-%% Iteracionar al radiacion
-Rrad=zeros(dof,1);
+%Preparar radiación
 Tespacio = 2.7;
 Trad = Tespacio.^4;
 boltz = 1.417e-8;
@@ -39,27 +37,4 @@ for s=1:6
     Ns{s} = Nm;
     dNauxs{s} = dNauxm; %fijate esta optimizacion papu. 2 minutos a 0.3 segundos
     %chau, te kiero elementos finulis. hola metodos numericos II
-end
-
-for e = 1:Nelem
-    index = elementos(e,:);
-    elenod = nodos(index,:);
-    s=0;
-    for snod = supnod'
-        s=s+1;
-        xnod=elenod(snod,1); ynod=elenod(snod,2); znod=elenod(snod,3);
-        if sum(  xnod==0 | xnod==0.8 | ynod==0 | znod ==.8 | znod==0  )>2
-            k=k+1;
-            r = zeros(4,1);
-            supindex = index(supnod(s,:));
-            for ipg = 1:npgs %Acá comienza la integracion sobre superficie
-                J = dNauxs{s}{ipg}*elenod;
-                % con la optimizacion se desvirtua todo, pero bue, es lo
-                % que hay
-                Tupg = T(index)'*Ns{s}(ipg,:)'; %interpolacion
-                r = r-Ns{s}(ipg,supnod(s,:))'*boltz*(Tupg^4 - Trad)*det(J)*wpg(ipg);%Ojo, es negativo porque el calor se ``va''
-            end
-            Rrad(supindex)=Rrad(supindex)+r;
-        end
-    end
 end
