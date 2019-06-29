@@ -5,10 +5,10 @@ AB = [1.8 1.8];
 longE = LargoMotor/4*ones(3,1)';%[1.2 2.95 ] %E1, E2, E3
 rpmexc = 600;
 omegaexc = rpmexc/60*2*pi;
-Lelemax=.2; %Longitud máxima de elementos
+Lelemax=.125; %Longitud máxima de elementos
 
-hv = 0.025:.005:0.09;
-bv = 0.025:.005:0.09;
+hv = 0.070:.00125:.1;
+bv = 0.045:.00125/2:0.06;
 Nh = length(hv);
 Nb = length(bv);
 
@@ -27,7 +27,7 @@ for h = hv
     for b = bv
         waitbar(((ih-1)*Nb+ib)/Ntotal,l,sprintf('h=%0.3f[m]',h))
         mainiterable
-        Shb(ih,ib) = maxsig;
+%         Shb(ih,ib) = maxsig;
         AModhb(ih,ib) = AmpMod;
         AProphb(ih,ib) = AmpProp;
         Secchb(ih,ib) = h*b;
@@ -35,36 +35,29 @@ for h = hv
     end
     ib=1;
     ih=ih+1;
-%     waitbar(((ih)*Nb+ib)/Ntotal,l,sprintf('h=%0.3f',h))
 end
-close(l)
+% close(l)
 close all
-[Xh ,Yb] = meshgrid(hv,bv);
+[Xb ,Yh] = meshgrid(bv,hv);
 figure(1)
-surf(Xh,Yb,AModhb)
+surf(Xb,Yh,AModhb)
 title('Amplitud en funcion de h y b (Amort. modal)')
-xlabel('h [m]')
-ylabel('b [m]')
+xlabel('b [m]')
+ylabel('h [m]')
 
 figure(2)
 isnn=AProphb==0;
 AProphb(isnn)=nan;
-surf(Xh,Yb,AProphb)
+surf(Xb,Yh,AProphb)
 title('Amplitud en funcion de h y b (Amort. prop.)')
-xlabel('h [m]')
-ylabel('b [m]')
+xlabel('b [m]')
+ylabel('h [m]')
 
 figure(3)
-surf(Xh,Yb,AModhb./Secchb)
+surf(Xb,Yh,AModhb./Secchb)
 title('Seccion en funcion de h y b')
-xlabel('h [m]')
-ylabel('b [m]')
-
-figure(4)
-surf(Xh,Yb,Shb)
-title('Tension cuasiestatica en funcion de h y b')
-xlabel('h [m]')
-ylabel('b [m]')
+xlabel('b [m]')
+ylabel('h [m]')
 
 %% Find minimum amplitud
 mini=min(min(AProphb));

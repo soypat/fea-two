@@ -16,7 +16,7 @@ Nvigas = size(elementos,1);
 E = 200e9;
 rho = 7900;
 nu=0.3;
-
+G=E/(2-2*nu);
 A=b*h;
 Iz = b*h^3/12;
 Iy = h*b^3/12;
@@ -49,20 +49,19 @@ for e = 1:Nvigas
     M(storeTo,storeTo) = M(storeTo,storeTo) + Me;
 end
 
-%% ""Rigid Links""
+%% ""Rigid Beams""
 isFixed = false(dof,1);
 Nrigid = Nrojo*2;
 krigid = 1e8;
 rigidElementos =[];
+[ke,~] = vigastiffness(E*100,nu,rho,A,Iz,Iy,Jtors,.5); % Viga Rigid
 for e = 1:Nrojo %Unimos barras a la masa, para sustituir lo que seria un rigid link
     for i=1:2
     storeTo = [n2d6(rojos(e)) n2d6(masa)];
     n1=nodos(rojos(e,i),:);n2=nodos(masa,:);
     rigidElementos = [rigidElementos;rojos(e,i) masa];
-    [ke, ~] = vigastiffness(krigid,nu,0,1,0,0,0,1);
     Ke = vigorotar(ke,n1,n2,[0 0 -1]);
     K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
-    isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar su muerte
     end
 end
 
@@ -98,47 +97,9 @@ Fmasa = [0 0 F0 0 0 0]; % se mueve 10mm en z
 storeTo = n2d6(masa);
 R = zeros(dof,1);
 R(storeTo) = Fmasa;
-Rr = R(isFree);
-
-%% Cuasiestatico
-Fcuasi = [0 0 -masapuntual(1,1)*9.81 0 0 0];
-Rcuasi = zeros(dof,1);
-Rcuasi(n2d6(masa)) = Fcuasi;
-Dr = Kr\Rcuasi(isFree);
-D = zeros(dof,1);
-D(isFree)=Dr;
-maxsig=0;
-for e = 1:Nvigas
-    n1 = nodos(elementos(e,1),:);
-    n2 = nodos(elementos(e,2),:);
-    T = Tv(n2-n1,[0 0 1]);
-    [ke, me] = vigastiffness(E,nu,rho,A,Iz,Iy,Jtors,Le);
-    Ke =T*ke*T';
-    Dlocal=D(elemDof(e,:));
-    flocal=ke*T'*Dlocal;
-    Nx =  flocal(1);
-    Vy =  flocal(2);
-    Vz =  flocal(3);
-    Mx1 = flocal(4);
-    My1 = flocal(5);
-    Mz1 = flocal(6);
-    Mx2 = flocal(10);
-    My2 = flocal(11);
-    Mz2 = flocal(12);
-    Mz=max([Mz1 Mz2]);
-    My = max([My1 My2]);
-    A=b*h;
-    sig = Nx/A+abs(Mz*h/(2*Iz));
-    sig2 = Nx/A+abs(My*b/(2*Iy));
-    if maxsig<max([sig,sig2])
-        maxsig=max([sig,sig2]);
-    end
-end
+Rrexc = R(isFree);
 
 
 resonance
-
-
-
 
 

@@ -112,6 +112,8 @@
 	\glossentry{\Cme{D}}{Vector de desplazamientos.}
 	\glossentry{\chi}{Razón entre la frecuencia de excitación y la frecuencia natural del modo estudiado.}
 	\glossentry{\Mme{C}}{Matriz de amortiguamiento.}
+	\glossentry{L_c}{Longitud caracteristica de elemento. Parametro de refinado de malla.}
+	\glossentry{\omega_e=\omega_{\mathrm{exc}}}{Frecuencia de excitacion [rad/s].}
 \end{multicols}
 
 \setcounter{section}{-1}
@@ -204,46 +206,58 @@ Para un primer análisis se fijaron las distancias entre los bulones de tal form
 \caption{Posición en $x$ de los nodos correspondientes a los bulones que unen doble fondo con basamento y las vigas estructurales en $y$.}
 \end{table}
 
-Para dimensionar las vigas del basamento se comenzó resolviendo el sistema cuasiestático donde la única carga es el peso del motor. Esto dará un rango de dimensiones inicial para trabajar el problema dinamicamente y además se aprovechara posicionar los soportes en $y$ de tal forma que reduzcan las tensiones en régimen cuasiestático. Luego del dimensionado cuasiestático (todas las vigas tienen las mismas dimensiones para simplificar el problema) iteramos variando $h$ y $b$ para todas las vigas. El amortiguamiento del sistema está controlado por la resina en los bulones. Se decidió modelar esto como un amortiguamiento global de $\dampfact = 0,1$ en un análisis con amortiguamiento modal. La excitación $\omega_{\mathrm{exc}}$ es de 600 rpm y se calcula la amplitud de excitación según un desplazamiento de $10$mm sobre la masa puntual en la dirección $z$.
+Para dimensionar las vigas del basamento se comenzó resolviendo el sistema cuasiestático donde la única carga es el peso del motor. Esto dará un rango de dimensiones inicial para trabajar el problema dinamicamente y además se aprovechara posicionar los soportes en $y$ de tal forma que reduzcan las tensiones en régimen cuasiestático. 
 
-Por último se va efectuar un análisis con amortiguamiento proporcional usando la primer frecuencia natural del sistema como $\omega_1$ y $\omega_2 = 1,15 \omega_{\mathrm{exc}}$. Se amortiguan estos modos con $\dampfact_{1}=0,06$ y $\dampfact_2=0,2$, respectivamente. El desarrollo de esta formulación queda detallada en la parte B de este informe. 
+Se considera que el amortiguamiento del sistema está controlado por la resina en los bulones para el análisis dinámico. Se decidió modelar esto como un amortiguamiento global de $\dampfact = 0,1$ en un análisis con amortiguamiento modal. La excitación $\omega_{\mathrm{exc}}$ es de 600 rpm y se calcula la amplitud de excitación según un desplazamiento de $10$mm sobre la masa puntual en la dirección $z$.
+
+Por último se va efectuar un análisis con amortiguamiento proporcional usando la primer frecuencia natural del sistema como $\omega_1$ y $\omega_2 = 1,15 \omega_{\mathrm{exc}}$. Se amortiguan estos modos con $\dampfact_{1}=0,073$ y $\dampfact_2=0,2$, respectivamente. El desarrollo de esta formulación queda detallada en la parte B de este informe. Los valores fueron escogidos para remarcar una frecuencia natural del sistema (figura \ref{fig:sinesweepA}).
 
 \section{Resultados del dimensionamiento}
+En base al dimensionamiento estático se elige entonces una viga rectangular $h=70\si{\milli \meter}$ y $b=45\si{\milli \meter}$. Dada viga es sometida a una tensión máxima de $45$MPa bajo el peso del motor. Un cambio pequeño de sección (reducción de $5$mm de $b$) ocasionaba un fuerte incremento en las tensiones, casi duplicando la tensión por momentos flexores.
 
-Se ve una diferencia importante en la suavidad entre las superficies que representan la amplitud en función de $h$ y $b$ según el tipo de amortiguamiento usado. Sin embargo, ambas tienen una interpretación concreta.
-
-El amortiguamiento modal impone un amortiguamiento global. Esto implica que todo el espectro de frecuencias naturales entra en juego para una excitación dada. Al cambiar la rigidez del sistema su estructura tendrá mayor resistencia ante el movimiento del motor.
-
-Por otro lado el amortiguamiento proporcional discrimina según la frecuencia. Lo que puede estar sucediendo al momento de cambiar las dimensiones de la viga es que cambiamos cual frecuencia natural domina. En las zonas de amplitud máxima puede ser que dominen las frecuencias cercanas a $\omega_{\mathrm{exc}}$ mientras que en los valles la rigidez de las vigas en conjunto es lo suficientemente diferente para que cambie el modo de deformación.
+Un barrido en frecuencia (figura \ref{fig:sinesweepA}) revela la posibilidad que se trabaja cerca a una frecuencia natural, aunque no es del todo seguro ya que \textbf{pequeños} cambios en el amortiguamiento (aumentando o disminuyendo $\zeta_1$ y $\zeta_2$) disminuyen el pico obtenido. Cabe destacar que la amplitud para esta frecuencia natural es menor a la que se tiene en régimen cuasiestático. En cualquier caso, la zona de trabajo queda afuera del pico por un margen considerable.
 
 
-
-Se elige entonces una viga rectangular $h=6,5\si{\milli \meter}$ y $b=8\si{\milli \meter}$
 
 
 \begin{figure}[htb!]
 	\centering
-	\begin{subfigure}{0.47\textwidth}
-		\includegraphics[width=\linewidth]{fig/amplitudVshb.eps}
-		\caption{Amplitud en función de las dimensiones $h$ y $b$ de la viga considerando desplazamiento $d=10$mm. Amarillo es mayor, azul es menor.}
-		\label{fig:amplitudVshb}
-	\end{subfigure}
-\hfill
-	\begin{subfigure}{0.5\textwidth}
+	\includegraphics[width=0.6\textwidth]{fig/sinesweepA.eps}
+	\caption{Barrido de frecuencias en el rango de trabajo con vigas $h=70$mm y $b=45$mm. $\omega_{\mathrm{exc}}$ es la frecuencia de trabajo del motor}
+	\label{fig:sinesweepA}
+\end{figure}
+
+
+
+\subsection*{Optimización teórica}
+Se obtuvieron mapas de respuesta del sistema en función de las dimensiones de la viga $h$ y $b$, y el refinamiento global $L_c$. Los mapas muestran una zona que no se comporta bien ante la excitación $\omega_{\mathrm{exc}}$ para dimensiones cercanas a la dimensión estática. Guiándonos por el mapa de mayor refinamiento (figura \ref{fig:amplitudVshbPropref}) se concluye que la dimensión ideal para las vigas es de $b=55mm$ y $h=80mm$ ya que esta se encuentra lejos de picos de amplitud.
+
+\section{Conclusión}
+Para cerrar, vemos que la formulación del amortiguamiento tiene una influencia grande en los resultados de análisis dinámico y que sus parámetros deben ser elegidos cuidadosamente. La dificultad en obtener datos sobre el amortiguamiento especifico de materiales lleva a la necesidad de modelado aproximado de este usando el método proporcional y modal.
+
+
+\begin{figure}[htb!]
+	\centering
+	\begin{subfigure}{0.49\textwidth}
 		\includegraphics[width=\linewidth]{fig/amplitudVshbProp.eps}
-		\caption{Amplitud en función de las dimensiones $h$ y $b$ de la viga en un análisis modal considerando una fuerza constante. Amarillo es mayor, azul es menor. Longitud de elemento caracteristica $L_e=0,1$m.}
+		\caption{Longitud de elemento característica $L_c=0,5$m.}
 		\label{fig:amplitudVshbProp}
 	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[width=\linewidth]{fig/amplitudVshbPropLc01.eps}
+		\caption{Longitud de elemento caracteristica $L_c=0,1$m.}
+		\label{fig:amplitudVshbProp}
+	\end{subfigure}
+	\caption{Amplitud en función de las dimensiones $h$ y $b$ de la viga en un análisis modal. Amarillo es mayor, azul es menor.}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[htb!]
 	\centering
-			\includegraphics[width=0.7\linewidth]{fig/amplitudVshbPropRefinado.eps}
-	\caption{Similar a figura \ref{fig:amplitudVshbProp} pero con refinamiento de elementos global. Longitud de elemento caracteristica $L_e=0,05$m.}
+	\includegraphics[width=0.7\linewidth]{fig/amplitudVshbPropRefinado.eps}
+	\caption{Similar a figura \ref{fig:amplitudVshbProp} pero con refinamiento de iteracion. Longitud de elemento característica $L_c=0,125$m.}
 	\label{fig:amplitudVshbPropref}
 \end{figure}
-
-\section{Optimización teórica}
 
 
 \clearpage
