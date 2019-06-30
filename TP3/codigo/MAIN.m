@@ -8,7 +8,7 @@ volumen = L*L*L/8;
 %% SOLVE:
 funcforma
 
-div = 9;
+div = 5;
 div2=ceil(9/2);
 
 [nodos, ~,elementos] = mesh3D([0 L/2;0 L/2;0 L/2],[div div div]);
@@ -108,10 +108,10 @@ Tlast = T;
 prepRad %Preparo optimizador de radiación (guardo funcformas en puntos gauss)
 keepGoing=true;
 i=1;
-
+T(xx)=400;%Condicion inicial para que converga 
 while keepGoing
     %% SOLVER RADIACIÓN
-    radiacion
+    radiacion %Se genera el vector {Rrad} en funcion de {T}
     R = Rgen + Rrad;
     T(xx) = K(xx,xx)\(R(xx)-K(xx,cc)*T(cc));
 %     AreaRad % Area radiativa es 0.48m^2 ... verificar variable
