@@ -21,14 +21,14 @@ for e = 1:Nelem
                 Djac = det(J(1:2,1:2));
                 % con la optimizacion se desvirtua todo, pero bue, es lo
                 % que hay
-                r = r-Ns{s}(ipg,supnod(s,:))'*boltz.*(T(supindex).^4 - Trad)*Djac*wpg(ipg);
+%                 r = r-Ns{s}(ipg,supnod(s,:))'*boltz.*(T(supindex).^4 - Trad)*Djac*wpg(ipg);
                 %% CON INTERPOLACION PUNTOS GAUSS PARA TEMPERATURAS: (no es muy feliz con la radiacion)
-%                 for n=1:Nnodporelem
-%                     Tupg = Tupg + T(index(n))*Ns{s}(ipg,n);
-%                 end
-%                 Tupg = T(index)'*Ns{s}(ipg,:)'; %interpolacion
-%                 r = r-Ns{s}(ipg,supnod(s,:))'*boltz*(Tupg^4 - Trad)*Djac*wpg(ipg);%Ojo, es negativo porque el calor se ``va''
-%                 AreaRad=AreaRad+Djac;
+                for n=1:Nnodporelem
+                    Tupg = Tupg + T(index(n))*Ns{s}(ipg,n);
+                end
+                Tupg = T(index)'*Ns{s}(ipg,:)'; %interpolacion
+                r = r-Ns{s}(ipg,supnod(s,:))'*boltz*(Tupg^4 - Trad)*Djac*wpg(ipg);%Ojo, es negativo porque el calor se ``va''
+                AreaRad=AreaRad+Djac;
             end
             Rrad(supindex)=Rrad(supindex)+r;
         end

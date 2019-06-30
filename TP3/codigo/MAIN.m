@@ -8,7 +8,7 @@ volumen = L*L*L/8;
 %% SOLVE:
 funcforma
 
-div = 5;
+div = 9;
 div2=ceil(9/2);
 
 [nodos, ~,elementos] = mesh3D([0 L/2;0 L/2;0 L/2],[div div div]);
@@ -94,48 +94,28 @@ Rk = zeros(dof,1);
 T = zeros(dof,1);
 
 %% Condiciones de borde
-
 cc=false(dof,1);
-% cc = wallnod;
 cc(medio)=true;
 xx = ~cc;
-% T(interiornod)=(Ts+300)/2;
 T(medio) = 300; %K condicion de borde
+
 Tlast = T;
-
-
-R(xx)=Rgen(xx);
-T(xx)=60;
 
 %% LAST RESOLUTION
 % v = load('Tf.mat');
 % T = v.T;
 %% Iteracion para llegar a regimen estacionario (estado estable)
-
-prepRad
+prepRad %Preparo optimizador de radiación (guardo funcformas en puntos gauss)
 keepGoing=true;
 i=1;
 
-beta =1; %futuro=1, pasado=0
-
-Rradlast=zeros(dof,1);
-% Area radiativa es 0.48m^2
 while keepGoing
-%     for j = 1:raditer
-%         radiacion
-%         R = Rgen+Rrad*beta+(1-beta)*Rradlast;
-%         Rradlast=Rrad;
-%         T(xx) = K(xx,xx)\(R(xx)-K(xx,cc)*T(cc));
-%     end
-% comun
+    %% SOLVER RADIACIÓN
     radiacion
-    R=Rgen +Rrad*(1-beta);
-    Rradlast=Rrad;
+    R = Rgen + Rrad;
     T(xx) = K(xx,xx)\(R(xx)-K(xx,cc)*T(cc));
-    radiacion
-    R=Rgen+Rrad*beta +Rradlast*(1-beta);
-    T(xx) = K(xx,xx)\(R(xx)-K(xx,cc)*T(cc));
-    
+%     AreaRad % Area radiativa es 0.48m^2 ... verificar variable
+    %% PostProcess (graficado)
     if norm(Tlast-T)/norm(Tlast) <1e-8 && i>20
         warning('Ending simulation. error low')
         keepGoing=false;
@@ -148,8 +128,6 @@ while keepGoing
         drawnow
     end
     Tlast = T;
-    
-    T(medio)=300;
     if isnan(T(wallnod(1)))
         error('NAN FOUND!')
         break
