@@ -8,7 +8,7 @@ volumen = L*L*L/8;
 %% SOLVE:
 funcforma
 
-div = 7;
+div = 29;
 div2=ceil(9/2);
 
 [nodos, ~,elementos] = mesh3D([0 L/2;0 L/2;0 L/2],[div div div]);
@@ -38,8 +38,8 @@ Kc = [k 0 0
 [Ns,~,dNauxs,~] = shapefunGP(upg,N,dN,dNaux,NL); %Funcion optimizadora
 
 %% Rigidity Assemble and charges
-Kg = zeros(dof,dof);
-Cg = zeros(dof,dof);
+Kg = sparse(dof,dof);
+Cg = sparse(dof,dof);
 Rgen=zeros(dof,1);
 wallnod=false(Nnod,1);
 for e = 1:Nelem
@@ -92,7 +92,7 @@ C= Cg;
 R = zeros(dof,1);
 Rk = zeros(dof,1);
 T = zeros(dof,1);
-
+Tnxt = zeros(dof,1);
 %% Condiciones de borde
 cc=false(dof,1);
 cc(medio)=true;
@@ -102,19 +102,35 @@ T(medio) = 300; %K condicion de borde
 Tlast = T;
 
 %% LAST RESOLUTION
-% v = load('Tf.mat');
-% T = v.T;
+v = load('Tf.mat');
+T = v.T;
 %% Iteracion para llegar a regimen estacionario (estado estable)
 prepRad %Preparo optimizador de radiación (guardo funcformas en puntos gauss)
 keepGoing=true;
 i=1;
 T(xx)=2.8;%Condicion inicial para que converga 
+%% TRANSITORIO
+dt = 6000;
+dtdiv2=dt/2;
+t_tot = 100000;
+Nt = ceil(t_tot/dt);
+beta=0.5;
+iterskip=30;
 while keepGoing
     %% SOLVER RADIACIÓN
+    tiempo = i*dt;
     radiacion %Se genera el vector {Rrad} en funcion de {T}
-    R = Rgen + Rrad;
-    T(xx) = K(xx,xx)\R(xx);
-    T
+    Rnxt = Rgen + Rrad;
+    if beta == 0
+        Tnxt = C\((C-dt*K)*T + dt*R);
+    elseif beta==.5
+        Tnxt(xx) = (C(xx,xx)+dtdiv2*K(xx,xx))\((C(xx,xx)-dtdiv2*K(xx,xx))*T(xx) + dtdiv2*(R(xx)+Rnxt(xx) ));
+    else
+        Tnxt = (C+beta*dt*K)\((C-dt*(1-beta)*K)*T + dt*((1-beta)*R+beta*Rnxt));
+    end
+    Tnxt(medio)=300;
+%     norm(T-Tnxt)/norm(T)
+    
     if max(Rrad) > 0
         error('SHIT! R>0')
     end
@@ -123,15 +139,16 @@ while keepGoing
     if norm(Tlast-T)/norm(Tlast) <1e-8 && i>20
         warning('Ending simulation. error low')
         keepGoing=false;
-    elseif mod(i,1)==0
+    elseif mod(i,iterskip)==0
         Tin = T(interiornod);
-        scatter(i,Tin(end),'r.')
+        scatter(i*dt,Tin(end),'r.')
         hold on
-        scatter(i,T(1),'b.')
+        scatter(i*dt,T(1),'b.')
         hold on
         drawnow
     end
-    Tlast = T;
+    T = Tnxt;
+    R = Rnxt;
     if isnan(T(wallnod(1)))
         error('NAN FOUND!')
         break
@@ -141,12 +158,13 @@ end
 
 title(sprintf('Convergencia con %0.0f elementos',Nelem))
 ylabel('Temperatura [K]')
-xlabel('Iteracion')
+xlabel('Tiempo [s]')
 legend('T_i','T_s')
 grid on
+
 figure(2)
 plot(xv,T(xnv),'k--^')
-title('Perfil de temperaturas Centro-Superficie')
+title(sprintf('Perfil de temperaturas Centro-Superficie [%0.0f]',Nelem))
 xlabel('x [m]')
 ylabel('Temperatura [K]')
 grid on
