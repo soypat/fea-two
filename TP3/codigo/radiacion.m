@@ -22,7 +22,7 @@ for e = 1:Nelem
                 AreaRad=AreaRad+Djac;
                 % con la optimizacion se desvirtua todo, pero bue, es lo
                 % que hay, Tiene un continue al final OJO v
-%                 r = r-Ns{s}(ipg,supnod(s,:))'*boltz.*(T(supindex).^4 - Trad)*Djac*wpg(ipg);continue;
+                r = r-Ns{s}(ipg,supnod(s,:))'*boltz.*(T(supindex).^4 - Trad)*Djac*wpg(ipg);continue;
 
                 %% CON INTERPOLACION PUNTOS GAUSS PARA TEMPERATURAS: (no es muy feliz con la radiacion)
                 for n=1:Nnodporelem

@@ -51,7 +51,7 @@ Zprop = (Rmod./omega.^2)./ ...
 AmpMod = sum(abs(Zmod));
 AmpProp = sum(abs(Zprop));
 
-return
+% return
 % input_omega = 0:2000:200000;
 input_omega = 0:1:(omegaexc*1.25);
 Nfrec = length(input_omega);

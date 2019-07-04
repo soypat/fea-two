@@ -5,7 +5,7 @@ AB = [1.8 1.8];
 longE = [.7 1 .8];%[1.2 2.95 ] %E1, E2, E3
 rpmexc = 600;
 omegaexc = rpmexc/60*2*pi;
-Lelemax=.08; %Longitud máxima de elementos
+Lelemax=.2; %Longitud máxima de elementos
 h = .07;
 b = .045;
 
@@ -64,26 +64,23 @@ Nrigid = Nrojo*2;
 krigid = 1e8;
 rigidElementos =[];
 [ke,~] = vigastiffness(E*100,nu,rho,A,Iz,Iy,Jtors,.5);
-for e = 1:Nrojo %Unimos barras a la masa, para sustituir lo que seria un rigid link
-    for i=1:2
-    storeTo = [n2d6(rojos(e)) n2d6(masa)];
-    n1=nodos(rojos(e,i),:);n2=nodos(masa,:);
-    rigidElementos = [rigidElementos;rojos(e,i) masa];
+red=reshape(rojos,[],1);
+for e = 1:Nrojo*2 %Unimos barras a la masa, para sustituir lo que seria un rigid link
+    for i=1:1
+    storeTo = [n2d6(red(e)) n2d6(masa)];
+    n1=nodos(red(e),:);n2=nodos(masa,:);
+    rigidElementos = [rigidElementos;red(e) masa];
     Ke = vigorotar(ke,n1,n2,[0 0 -1]);
     K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
 %     isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar su muerte
     end
 end
-
 %% Acoplo masa puntual
 masapuntual = 1e6*blkdiag(.055, .055, .055, 0.49, 0.28455,0.28455);
 storeTo = n2d6(masa);
 M(storeTo,storeTo)=M(storeTo,storeTo) + masapuntual;
 
-% digitosPerdidos = get_cond(K);
-% if digitosPerdidos >10
-%     error('Condicionamiento malo!')
-% end
+
 
 
 %% Creo las condiciones de bordes en forma de bulones
@@ -100,6 +97,10 @@ K = abulonar(azules(:,2),K,[kb kbt kbt]); %Restringo las otras
 isFree=~isFixed;
 Kr = K(isFree,isFree);
 Mr = M(isFree,isFree);
+digitosPerdidos = get_cond(Kr);
+if digitosPerdidos >10
+    error('Condicionamiento malo!')
+end
 %% Busco Fuerzas para causar desplazamientos iniciales
 dmasa = 10e-3;
 % DEMOSTRACION:
@@ -118,11 +119,23 @@ Rcuasi(n2d6(masa)) = Fcuasi;
 Dr = Kr\Rcuasi(isFree);
 D = zeros(dof,1);
 D(isFree)=Dr;
+%% GRAFICAR DESP
+desp = reshape(D,6,[])';
+mag=50;
+posdef=nodos+mag*desp(:,1:3);
+
+figure(3)
+scatter3(nodos(:,1),nodos(:,2),nodos(:,3),'k.')
+hold on
+scatter3(posdef(:,1),posdef(:,2),posdef(:,3),'r*')
+legend('Posicion indeformada','Posicion deformada')
+% return
+
+%% FORM FUNCTIONS
 maxsig=0;
 % getTension
 % Parametros geometricos cuadrados (Cook pg 50. 2.9-6)
 cy=1.5;cz=cy;cT=0.675*h;
-%% FORM FUNCTIONS
 clear x
 xv = [0,1]; % puntos de interpolacion
 basaMotor=[];
@@ -149,7 +162,7 @@ X1=[];
 SX1=[]'
 X2=[];
 SX2=[];
-
+% Dpush=
 for e=[basaMotor(:,1)',fijoBasa(:,1)']
     k=k+1;
     xv=1;
@@ -210,24 +223,18 @@ ylabel('Tension por flexion y compresion [MPa]')
 xlabel('Posicion en x del bulon [m]')
 
 %%Desplazamientos
-desp = reshape(D,6,[])';
-mag=50;
-posdef=nodos+mag*desp(:,1:3);
-
-figure(3)
-scatter3(nodos(:,1),nodos(:,2),nodos(:,3),'k.')
-hold on
-scatter3(posdef(:,1),posdef(:,2),posdef(:,3),'r*')
-legen('Posicion indeformada','Posicion deformada')
+% desp = reshape(D,6,[])';
+% mag=50;
+% posdef=nodos+mag*desp(:,1:3);
+% 
+% figure(3)
+% scatter3(nodos(:,1),nodos(:,2),nodos(:,3),'k.')
+% hold on
+% scatter3(posdef(:,1),posdef(:,2),posdef(:,3),'r*')
+% legen('Posicion indeformada','Posicion deformada')
 
 %% TERMINO EL CODIGO
 return
-
-
-
-
-
-
 
 for e = 1:Nvigas
     Dlocal=D(elemDof(e,:));
