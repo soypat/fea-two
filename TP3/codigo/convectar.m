@@ -29,7 +29,7 @@ for e = 1:Nelem
                     Tupg = Tupg + T(index(n))*Ns{s}(ipg,n);
                 end
                 Tupg = T(index)'*Ns{s}(ipg,:)'; %interpolacion
-                r = r-Ns{s}(ipg,supnod(s,:))'*boltz*(Tupg.^4 - Trad)*Djac*wpg(ipg);%Ojo, es negativo porque el calor se ``va''
+                r = r-Ns{s}(ipg,supnod(s,:))'*boltz*(Tupg - Trad)*Djac*wpg(ipg);%Ojo, es negativo porque el calor se ``va''
             end
             Rrad(supindex)=Rrad(supindex)+r;
         end

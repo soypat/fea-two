@@ -8,7 +8,7 @@ volumen = L*L*L/8;
 %% SOLVE:
 funcforma
 
-div = 29;
+div =5;
 div2=ceil(9/2);
 
 [nodos, ~,elementos] = mesh3D([0 L/2;0 L/2;0 L/2],[div div div]);
@@ -102,15 +102,15 @@ T(medio) = 300; %K condicion de borde
 Tlast = T;
 
 %% LAST RESOLUTION
-v = load('Tf.mat');
-T = v.T;
+% v = load('Tf.mat');
+% T = v.T;
 %% Iteracion para llegar a regimen estacionario (estado estable)
 prepRad %Preparo optimizador de radiación (guardo funcformas en puntos gauss)
 keepGoing=true;
 i=1;
-T(xx)=2.8;%Condicion inicial para que converga 
+% T(xx)=2.8;%Condicion inicial para que converga 
 %% TRANSITORIO
-dt = 6000;
+dt = 100;
 dtdiv2=dt/2;
 t_tot = 100000;
 Nt = ceil(t_tot/dt);
@@ -119,24 +119,27 @@ iterskip=30;
 while keepGoing
     %% SOLVER RADIACIÓN
     tiempo = i*dt;
+    T(medio)=300;
     radiacion %Se genera el vector {Rrad} en funcion de {T}
     Rnxt = Rgen + Rrad;
     if beta == 0
         Tnxt = C\((C-dt*K)*T + dt*R);
     elseif beta==.5
-        Tnxt(xx) = (C(xx,xx)+dtdiv2*K(xx,xx))\((C(xx,xx)-dtdiv2*K(xx,xx))*T(xx) + dtdiv2*(R(xx)+Rnxt(xx) ));
+%         Tnxt(xx) = (C(xx,xx)+dtdiv2*K(xx,xx))\((C(xx,xx)-dtdiv2*K(xx,xx))*T(xx) + dtdiv2*(R(xx)+Rnxt(xx) ));
+        Tnxt = (C+dtdiv2*K)\((C-dtdiv2*K)*T + dtdiv2*(R+Rnxt ));
+
     else
         Tnxt = (C+beta*dt*K)\((C-dt*(1-beta)*K)*T + dt*((1-beta)*R+beta*Rnxt));
     end
     Tnxt(medio)=300;
 %     norm(T-Tnxt)/norm(T)
     
-    if max(Rrad) > 0
-        error('SHIT! R>0')
-    end
+%     if max(Rrad) > 0
+%         error('SHIT! R>0')
+%     end
 %     AreaRad % Area radiativa es 0.48m^2 ... verificar variable
     %% PostProcess (graficado)
-    if norm(Tlast-T)/norm(Tlast) <1e-8 && i>20
+    if norm(T-Tnxt)/norm(T) <1e-8 && i>20
         warning('Ending simulation. error low')
         keepGoing=false;
     elseif mod(i,iterskip)==0

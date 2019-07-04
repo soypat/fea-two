@@ -12,6 +12,7 @@ b = .045;
 % No-modificables
 rojoX = [417 667 1197 1727 2257 2787 3317 3847 4377 4907 5437]'/1000;
 
+
 ancho = 1.93;
 CG = [1.855 ancho/2 1];
 
@@ -210,8 +211,9 @@ xlabel('Posicion en x del bulon [m]')
 
 %%Desplazamientos
 desp = reshape(D,6,[])';
-posdef=nodos+mag*desp(:,1:3);
 mag=50;
+posdef=nodos+mag*desp(:,1:3);
+
 figure(3)
 scatter3(nodos(:,1),nodos(:,2),nodos(:,3),'k.')
 hold on

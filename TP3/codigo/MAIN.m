@@ -8,7 +8,7 @@ volumen = L*L*L/8;
 %% SOLVE:
 funcforma
 
-div = 7;
+div = 9;
 div2=ceil(9/2);
 
 [nodos, ~,elementos] = mesh3D([0 L/2;0 L/2;0 L/2],[div div div]);
@@ -98,7 +98,6 @@ cc=false(dof,1);
 cc(medio)=true;
 xx = ~cc;
 T(medio) = 300; %K condicion de borde
-
 Tlast = T;
 
 %% LAST RESOLUTION
@@ -108,19 +107,22 @@ Tlast = T;
 prepRad %Preparo optimizador de radiación (guardo funcformas en puntos gauss)
 keepGoing=true;
 i=1;
-T(xx)=2.8;%Condicion inicial para que converga 
+T(xx)=2.7;%Condicion inicial para que converga
+relajacion = 10;
+relajar=1/relajacion;
+
 while keepGoing
     %% SOLVER RADIACIÓN
-    radiacion %Se genera el vector {Rrad} en funcion de {T}
-    R = Rgen + Rrad;
-    T(xx) = K(xx,xx)\R(xx);
-    T
-    if max(Rrad) > 0
-        error('SHIT! R>0')
-    end
+%     convectar %Se genera el vector {Rrad} en funcion de {T}
+    radiacion
+    R = Rgen + Rrad; 
+    T(xx) = K(xx,xx)\(R(xx)-K(xx,cc)*T(cc));
+    DT = relajar*(T-Tlast);
+    T=Tlast+DT;
+    
 %     AreaRad % Area radiativa es 0.48m^2 ... verificar variable
     %% PostProcess (graficado)
-    if norm(Tlast-T)/norm(Tlast) <1e-8 && i>20
+    if norm(Tlast-T)/norm(Tlast) <1e-7 && i>20
         warning('Ending simulation. error low')
         keepGoing=false;
     elseif mod(i,1)==0
@@ -168,11 +170,19 @@ save('Tf.mat','T')
 
 %% Aplicamos condiciones de borde conocidas 
 %  para obtener un pantallazo del problema
+return
+title(sprintf('Oscilación con %0.0f elementos sin calor generado',Nelem))
+ylabel('Temperatura [K]')
+xlabel('Iteracion')
+legend('T_i','T_s')
+grid on
 
 
-
-
-
+title(sprintf('Divergencia con %0.0f elementos',Nelem))
+ylabel('Temperatura [K]')
+xlabel('Iteracion')
+legend('T_i','T_s')
+grid on
 %% Reso Radiacion
 
 

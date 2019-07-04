@@ -1,0 +1,14 @@
+La inherente no-linealidad de la radiación trae problemas además de la necesidad de iterar.
+A mayor refinamiento el método de conergencia se vuelve inestable y puede oscilar
+indefinidamente e incluso diverger por completo. Lo que causa esta divergencia es en gran
+parte las cargas volumétricas, como se ha visto en los graficos de oscilación estable sin
+calor generado. 
+
+Se podría pensar esto como un sistema sin sentido físico que evoluciona
+en el espacio iteración y tiene una variable de entrada y salida, la temperatura. El calor
+tiene que salir del sistema o por la condición de borde o por la radiación. Se podría investigar
+el sistema visto de está manera y obtener el orden. De esta forma se haría aparente que
+se trata de algo de una complejidad superior a la detallada en el enunciado.
+
+De aquí surgió la motivación para tratar el problema en estado transitorio. Se tienen herramientas
+vistas en clase para mejor lidiar con el comportamiento ''kickback´´ de las cargas radiativas. 
