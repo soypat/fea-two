@@ -148,7 +148,7 @@ Las condiciones de operación son las siguientes
 	\item El calor radiado tomando en cuenta el factor de forma queda $q_{r}=\SI{1,417e-8}{\watt \per \meter \squared \per \kelvin^4} \cdot \left( T^4 - T^4_{\mathrm{CMBR}} \right)$
 \end{itemize}
 
-Para la resolución se dividió el satélite en 64, 512 y 1000 elementos H8 y se contrastó los resultados de la convergencia.
+Para la resolución se dividió el satélite en 2744 elementos H8.
 
 Las condiciones de borde son las siguientes
 \begin{itemize}
@@ -181,9 +181,10 @@ La figura \ref{fig:perfil15} muestra el perfil de temperaturas dentro del satél
 	\label{fig:modelo}
 \end{figure}
 
-Se puede observar en la figura \ref{fig:Convergencia} como la solución converge tal que el punto más caliente de la superficie está en su centro (figure \ref{fig:perfilinterior}). 
 
-En la figura \ref{fig:perfilsurf15} se ve como un sistema simple como un cubo puede devolver perfiles de temperatura que pueden no tener una razón de ser inmediatamente aparente. En la figura \ref{fig:perfilsuperficie} podemos ver como los bordes están mas fríos que el centro de la cara radiadora. Es razonable pensar que los bordes tienen más superficie que los rodea y por ende terminan radiando más que el centro de la cara que se encuentra rodeada por masa. Sin embargo también entra en juego el medio del satélite, el cual se encuentra a una temperatura (300K) más fría que el resto del satélite. El centro se encuentra más cerca a la parte de la cara más caliente, sin embargo, su efecto enfriador se extiende hasta 25\% del camino a la cara, como se puede ver en la figura \ref{fig:perfilinterior}. 
+En la figura \ref{fig:perfilsurf15} se ve como un sistema simple como un cubo puede devolver perfiles de temperatura que pueden no tener una razón de ser inmediatamente aparente. En la figura \ref{fig:perfilsurf15} podemos ver como los bordes están mas fríos que el centro de la cara radiadora. Es razonable pensar que los bordes tienen más superficie que los rodea y por ende terminan radiando más que el centro de la cara que se encuentra rodeada por masa. Sin embargo también entra en juego el medio del satélite, el cual se encuentra a una temperatura (300K) más fría que el resto del satélite. El centro se encuentra más cerca a la parte de la cara más caliente, sin embargo, su efecto enfriador se extiende hasta 25\% del camino a la cara, como se puede ver en la figura \ref{fig:perfil15}. 
+
+Resolviendo para las cargas desconocidas se obtiene que el satélite pierde 10 watts en su centro.
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{fig/perfil13.eps}
@@ -205,8 +206,16 @@ En la figura \ref{fig:perfilsurf15} se ve como un sistema simple como un cubo pu
 \end{figure}
 
 \section*{Conclusión}
-En conclusión, la radiación conlleva una fuerte no linealidad la cual debe ser considerada y resuelta iterando cuando no se tiene otros efectos que dominen en las superficies, como la conveccion. 
+En conclusión, el satélite tendría que estar evacuando calor en su centro para mantener la temperatura de 300 grados kelvin. Esto se podría lograr usando un enfriador (\ref{fig:cryocooler}) o bien optando por una solución \textit{pasiva} y aumentando la superficie radiante del satélite. 
 
+Si se quiere resolver el problema de forma pasiva fijando el calor generado por unidad volumen se llega a que se tiene que reducir el volumen del satélite. Aunque el satélite se acerque a una forma esférica\footnote{Una esfera es la forma maciza más eficiente de radiar calor dado un volumen fijo.} se tiene que el régimen estacionario de una esfera que genera 2 kW/m$^3$ está a 328 Kelvin. 
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{fig/cryocooler.png}
+	\caption{Microenfriador para aplicaciones aerospaciales (Lockheed Martin). }
+	\label{fig:cryocooler}
+\end{figure}
 
 
 %\bibliography{labibliografia} % Indica archivo

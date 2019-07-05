@@ -53,7 +53,7 @@ for e = 1:Nelem
         J    = dNauxs{ipg}*elenod;
         dNxyz = J\dNauxs{ipg};
         B = [dNxyz(1,:);dNxyz(2,:);dNxyz(3,:)];
-        
+
         Ce = Ce + Ns{ipg}'*cap*Ns{ipg}*det(J)*wpg(ipg);
         Ke = Ke + B'*Kc*B*wpg(ipg)*det(J);
         r = r+Ns{ipg}'*Q*wpg(ipg)*det(J);
@@ -168,10 +168,19 @@ xlabel('Posicion sobre superficie [m]')
 grid on
 
 save('Tf.mat','T')
+Rx=K(cc,cc)*T(cc)+K(cc,xx)*T(xx);
+%% Otra solución
+vol=L*L*L;
+Area =L*L*6;
+Qin=vol*Q;
 
-%% Aplicamos condiciones de borde conocidas 
-%  para obtener un pantallazo del problema
+R_esfera=(3*vol/4/pi)^(1/3);
+sup_esfera=4*pi*R_esfera;
+T_esfera=(2.7^4 + Qin/1.417e-8/sup_esfera)^.25
+
 return
+
+
 title(sprintf('Oscilación con %0.0f elementos sin calor generado',Nelem))
 ylabel('Temperatura [K]')
 xlabel('Iteracion')
@@ -184,8 +193,7 @@ ylabel('Temperatura [K]')
 xlabel('Iteracion')
 legend('T_i','T_s')
 grid on
-%% Reso Radiacion
-
+%% Soluci
 
 %% Graph problema
 
