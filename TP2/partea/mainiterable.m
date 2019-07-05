@@ -78,7 +78,7 @@ M(storeTo,storeTo)=M(storeTo,storeTo) + masapuntual;
 
 %% Creo las condiciones de bordes en forma de bulones
 Eb=200e9;
-d =16e-3; %16mm
+d =20e-3; %16mm
 Ab= d^2/4*pi;
 Lb =70e-3; %70mm
 % Lbtransversal = d;

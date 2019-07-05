@@ -9,7 +9,7 @@ volumen = L*L*L/8;
 funcforma
 
 % MODIFICAS CANTIDAD DE ELEMENTOS
-div = 19;
+div = 11;
 div2=ceil(9/2);
 
 [nodos, ~,elementos] = mesh3D([0 L/2;0 L/2;0 L/2],[div div div]);

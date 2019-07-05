@@ -2,7 +2,7 @@
 LargoMotor = 5.719;
 % Modifiables
 AB = [1.8 1.8];
-longE = [.7 1 .8];%[1.2 2.95 ] %E1, E2, E3
+longE = [.797 1 .8];%[1.2 2.95 ] %E1, E2, E3
 rpmexc = 600;
 omegaexc = rpmexc/60*2*pi;
 Lelemax=.2; %Longitud máxima de elementos
@@ -85,11 +85,11 @@ M(storeTo,storeTo)=M(storeTo,storeTo) + masapuntual;
 
 %% Creo las condiciones de bordes en forma de bulones
 Eb=200e9;
-d =16e-3; %16mm
+d =20e-3; %16mm
 Ab= d^2/4*pi;
 Lb =70e-3; %70mm
 % Lbtransversal = d;
-kb = 200*Eb*Ab/Lb;
+kb = Eb*Ab/Lb;
 kbt = kb/10;
 K = abulonar(azules(:,1),K,[kb kbt kbt]); %La restringo (como que aplico condiciones de borde)
 K = abulonar(azules(:,2),K,[kb kbt kbt]); %Restringo las otras
