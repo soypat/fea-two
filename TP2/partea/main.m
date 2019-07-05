@@ -3,6 +3,7 @@ LargoMotor = 5.719;
 % Modifiables
 AB = [1.8 1.8];
 longE = [.7 1 .8];%[1.2 2.95 ] %E1, E2, E3
+% longE=[1.4 1.4 1];
 rpmexc = 600;
 omegaexc = rpmexc/60*2*pi;
 Lelemax=.5; %Longitud máxima de elementos
@@ -62,15 +63,13 @@ isFixed = false(dof,1);
 Nrigid = Nrojo*2;
 rigidElementos =[];
 [ke,~] = vigastiffness(E,nu,rho,A,Iz,Iy,Jtors,.5);
-for e = 1:Nrojo %Unimos barras a la masa, para sustituir lo que seria un rigid link
-    for i=1:2
-    storeTo = [n2d6(rojos(e)) n2d6(masa)];
-    n1=nodos(rojos(e,i),:);n2=nodos(masa,:);
-    rigidElementos = [rigidElementos;rojos(e,i) masa];
+red=reshape(rojos,[],1);
+for e = 1:Nrigid %Unimos barras a la masa, para sustituir lo que seria un rigid link
+    storeTo = [n2d6(red(e)) n2d6(masa)];
+    n1=nodos(red(e),:);n2=nodos(masa,:);
+    rigidElementos = [rigidElementos;red(e) masa];
     Ke = vigorotar(ke,n1,n2,[0 0 -1]);
     K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
-%     isFixed(storeTo)= isFixed(storeTo) | [0 0 0 0 0 0 0 0 0 1 1 1]'; %Matamos giros en la masa puntual repetidas veces para asegurar su muerte
-    end
 end
 
 %% Acoplo masa puntual
@@ -167,69 +166,10 @@ for e = 1:Nvigas
     end
 end
 
-% maxsig
+maxsig
+figure(6)
 resonance
-
-
-
-
-
-
-
-
-
-
-%% Non Linear analysis
-Rext=zeros(dof,1);
-Rext2=zeros(dof,1);
-dofred=sum(isFree);
-dt=.0001;
-dtdiv2=dt/2;
-tfinal=6;
-Nt=ceil(tfinal/dt);
-applyDof=masa*6-3;
-dt = 1/max(omega)/50000;
-alpha = 0.02;
-beta = 0.0002;%.1;
-
-C = alpha*Mr+beta*Kr;
-V = zeros(dofred,1); % Condicion inicial: velocidad = 0
-
-D = zeros(dofred,1); % desplazamientos = 0
-D_t = zeros(dofred,Nt);
-K=Kr;
-M=Mr;
-for i = 0:Nt
-    t = dt*i; %tiempo
-    Rext(applyDof)=F0*sin(omegaexc*t);
-    Rext2(applyDof)=F0*sin(omegaexc*(t+dt));
-    %Integracion explicita
-%      Vnxt = V + dtdiv2*(Mr\(Rext(isFree)-C*V-Kr*D));
-%      Dnxt = D + dtdiv2*(V);
-     % Integracion directa
-    k1V = M\(Rext(isFree)-C*V-K*D);
-    k1D = V;
-    
-    k2V = M\(Rext2(isFree)-C*(V+dtdiv2*k1V)-K*(D+dtdiv2*k1D));
-    k2D = V+dtdiv2*k1V;
-    
-    k3V = M\(Rext2(isFree) - C*(V+dtdiv2*k2V)-K*(D+dtdiv2*k2D));
-    k3D = V+dtdiv2*k2V;
-    
-    k4V = M\(Rext(isFree)-C*(V+dt*k3V)-K*(D+dt*k3D));
-    k4D = V+dt*k3V;
-    
-    Vnxt = V + dtdiv6*(k1V+2*(k2V+k3V)+k4V);
-    Dnxt = D + dtdiv6*(k1D+2*(k2D+k3D)+k4D);
-    if sum(isnan(Dnxt))>0
-        error('NaN found in solve')
-    end 
-    D_t(:,i+1) = D;
-    D = Dnxt;
-    V = Vnxt;
-end
-
-
-% resonance
-
+return
+figure(1)
+tensionesBulones
 

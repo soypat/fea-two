@@ -122,10 +122,12 @@
 
 \section{Introducción Teórica}
 Cuando se tiene una carga dependiente del tiempo la respuesta estructural también lo es. En el caso que sea un problema cuasiestático la resolución se puede hacer para los instantes de tiempos interesantes. Caso contrario se precisa efectuar un \textit{análisis dinámico}.
-\[
-\text{Cuasiestático:}\quad \Mme{K}\Cme{D} = \Cme{R} \longrightarrow \text{Dinámico:} \quad 
-\Mme{M} \Cme{\ddot{D}} + \Mme{C}\Cme{\dot{D}} + \Mme{K}\Cme{D} = \Cme{R}	
-\]
+\begin{equation} \label{eq:FuerzasDinamicas}
+	\text{Cuasiestático:}\quad \Mme{K}\Cme{D} = \Cme{R} \longrightarrow \text{Dinámico:} \quad 
+	\Mme{M} \Cme{\ddot{D}} + \Mme{C}\Cme{\dot{D}} + \Mme{K}\Cme{D} = \Cme{R}
+\end{equation}
+	
+
 donde el termino $\Mme{K}\Cme{D}$ suele ser referido como las \textit{fuerzas internas}, y $\Cme{R}$ siendo las \textit{fuerzas externas}.
 
 El análisis dinámico busca la forma de deformación del sistema cuando este se encuentra excitado por cargas a una frecuencia cercana a la natural. La respuesta en deformación del sistema con una carga cíclica puede ser menor o mayor que con cargas estáticas de misma magnitud máxima, pero cuando la frecuencia de carga se acerca a la natural las deformaciones serán mucho mayor. 
@@ -202,7 +204,7 @@ Para un primer análisis se fijaron las distancias entre los bulones de tal form
 	\begin{tabular}{lllll}
 		& 1 & 2 & 3 & 4 \\ \hline
 		Uniones Abulonadas& 0,097 \si{\meter}  & 1,897 \si{ \meter} & 3,697 \si{ \meter} & 5,567 \si{ \meter} \\
-		Soportes en $y$& 0,797 \si{\meter}  &1,787\si{\meter}   & 2,587 \si{\meter}  &  \\
+		Soportes en $y$& 0,700 \si{\meter}  &1,700\si{\meter}   & 2,500 \si{\meter}  &  \\
 	\end{tabular}
 \caption{Posición en $x$ de los nodos correspondientes a los bulones que unen doble fondo con basamento y las vigas estructurales en $y$.}
 \end{table}
@@ -223,44 +225,45 @@ Un barrido en frecuencia (figura \ref{fig:sinesweepA}) revela la posibilidad que
 
 \begin{figure}[htb!]
 	\centering
-	\includegraphics[width=0.6\textwidth]{fig/sinesweep1.png}
-	\caption{Barrido de frecuencias en el rango de trabajo con vigas $h=70$mm y $b=45$mm. $\omega_{\mathrm{exc}}$ es la frecuencia de trabajo del motor}
+	\includegraphics[width=0.6\textwidth]{fig/sinesweep.eps}
+	\caption{Barrido de frecuencias en el rango de trabajo con vigas $h=70$mm y $b=45$mm. $\omega_{\mathrm{exc}}$ es la frecuencia de trabajo del motor. Note que las unidades son arbitrarias para ambas amplitudes.}
 	\label{fig:sinesweepA}
 \end{figure}
 
 
 
 \subsection*{Optimización teórica}
-Se obtuvieron mapas de respuesta del sistema en función de las dimensiones de la viga $h$ y $b$, y el refinamiento global $L_c$. Los mapas muestran una zona que no se comporta bien ante la excitación $\omega_{\mathrm{exc}}$ para dimensiones cercanas a la dimensión estática. Guiándonos por el mapa de mayor refinamiento (figura \ref{fig:amplitudVshbPropref}) se concluye que la dimensión ideal para las vigas es de $b=55mm$ y $h=80mm$ ya que esta se encuentra lejos de picos de amplitud.
+Para la optimización teórica se resolvió el sistema integrando la ecuación \ref{eq:FuerzasDinamicas} mediante el método de Runge--Kutta para obtener la respuesta ante la excitación. Se varió la sección y luego $\alpha$ y $\beta$ del amortiguamiento (proporcional) \cite{cook2007concepts} para reducir las cargas transmitidas y desplazamientos. La mejor respuesta ante tensiones fue dada con $\alpha=0,002$ y $\beta = 0,00002$ y una sección de $h=0,070$m y $b=0,045$m. Cabe destacar que los valores obtenidos de la dimensión estática resultaron satisfactorios para el análisis de optimización teórica. Las tensiones por flexión de las vigas sobre los bulones se vé en las figuras \ref{fig:tensionBulon} y \ref{fig:tensionBulonRigid} \textbf{calculada en el tiempo}. Tener en cuenta que la máxima tensión fue hallada sobre un bulón conectado a un rigid beam (ver subtitulo de figuras mencionadas). Se calculo ante la flexión porque el modo de deformación es principalmente por flexión (\ref{fig:NoLineal}).
 
 \section{Conclusión}
-Para cerrar, vemos que la formulación del amortiguamiento tiene una influencia grande en los resultados de análisis dinámico y que sus parámetros deben ser elegidos cuidadosamente. La dificultad en obtener datos sobre el amortiguamiento especifico de materiales lleva a la necesidad de modelado aproximado de este usando el método proporcional y modal.
+Podemos ver en la figura \ref{fig:tensionBulonRigid} que la tensión ($\approx 380$MPa) se acerca a los límites superiores de un acero que trabaja a fatiga, sin embargo, este nodo se encuentra conectado a un rigid beam que transmite la carga de la excitación. Esto no es fiel a la realidad, pues el motor iría apoyado y transmitiría los esfuerzos sobre una superficie. A diferencia las tensiones máximas sobre los bulones que no van conectados a rigid beams no superan los 100MPa. 
+
+Sobre el tema de amortiguamiento proporcional, el valor elegido para $\alpha$ amortigua los modos bajos, su elección contribuyó a disminuir los esfuerzos transmitido, sin embargo la forma de calcular la matriz $\Mme{C}$ es una aproximación. Lograr el amortiguamiento calculado puede no ser posible.
+
+En conclusión, se puede apreciar como el comportamiento de un sistema con masa (el motor) sometido a una excitación  puede verse afectado por variables como la rigidez de su apoyo y la energía puede disipar este apoyo.
 
 
 \begin{figure}[htb!]
 	\centering
-	\begin{subfigure}{0.49\textwidth}
-		\includegraphics[draft,width=\linewidth]{fig/amplitudVshbProp.eps}
-		\caption{Longitud de elemento característica $L_c=0,5$m.}
-		\label{fig:amplitudVshbProp}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}{0.49\textwidth}
-		\includegraphics[draft,width=\linewidth]{fig/amplitudVshbPropLc01.eps}
-		\caption{Longitud de elemento caracteristica $L_c=0,1$m.}
-		\label{fig:amplitudVshbProp}
-	\end{subfigure}
-	\caption{Amplitud en función de las dimensiones $h$ y $b$ de la viga en un análisis modal. Amarillo es mayor, azul es menor.}
+	\includegraphics[width=.8\textwidth]{fig/tensionBulon.eps}
+	
+	\caption{Tensiones por flexión en el bulón más solicitado \textbf{no} conectado a rigid beam.}
+	\label{fig:tensionBulon}
 \end{figure}
 
 \begin{figure}[htb!]
 	\centering
-	\includegraphics[draft,width=0.7\linewidth]{fig/amplitudVshbPropRefinado.eps}
-	\caption{Similar a figura \ref{fig:amplitudVshbProp} pero con refinamiento de iteracion. Longitud de elemento característica $L_c=0,125$m.}
-	\label{fig:amplitudVshbPropref}
+	\includegraphics[width=.7\textwidth]{fig/tensionBulonRigid.eps}
+	\caption{Tensiones máximas obtenidas en el bulón más solicitado}
+	\label{fig:tensionBulonRigid}
 \end{figure}
 
-
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=.7\textwidth]{fig/analisisNoLineal.png}
+	\caption{Respuesta del basamento para la excitación en un instante de tiempo. Desplazamientos magnificados $\times 50$. Note que el modo de deformación es principalmente en flexión.}
+	\label{fig:NoLineal}
+\end{figure}
 
 
 \bibliography{labibliografia} % Indica archivo
