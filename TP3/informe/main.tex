@@ -113,11 +113,15 @@
 \end{multicols}
 
 %\setcounter{section}{-1}
-
+\newcommand{\xx}{{\mathrm{xx}}}
+\newcommand{\xc}{{\mathrm{xc}}}
+\newcommand{\cc}{{\mathrm{cc}}}
+\newcommand{\sx}{{\mathrm{x}}}
+\newcommand{\scc}{{\mathrm{c}}}
 %\tableofcontents
 
 \section*{Objetivo}
-Se va efectuar un pequeño estudio térmico de un satélite ubicado en el espacio profundo. El problema será resuelto mediante el método de elementos finitos y se analizaran las limitaciones de la resolución.
+Se va efectuar un estudio térmico de un satélite ubicado en el espacio profundo. El problema será resuelto mediante el método de elementos finitos.
 
 \section*{Hipótesis}
 \begin{itemize}
@@ -151,83 +155,58 @@ Las condiciones de borde son las siguientes
 	\item Se fija el punto medio del satélite a 300K
 	\item Las superficies expuestas del satélite intercambian calor con el entorno según la ecuación mencionada anteriormente
 \end{itemize}
-Antes de comenzar la iteración se resuelve el sistema en régimen estacionario sin radiación con temperatura de superficie igual a 2.7 grados kelvin para obtener un perfil preliminar. Luego comienza la iteración con el perfil de temperaturas obtenidas y termina una vez llegado a un error aceptable (ecuación \ref{ec:error})
+
+Comienza la iteración  y termina una vez llegado a un error aceptable (ecuación \ref{ec:error})
 \begin{equation}\label{ec:error}
-	e_{\mathrm{convergencia}}=\frac{||\CT^{n+1}-\CT^{n}||}{||\CT^{n}||} < 10^{-8}
+	e_{\mathrm{convergencia}}=\frac{||\CT^{n+1}-\CT^{n}||}{||\CT^{n}||} < 10^{-7}
 \end{equation}
-Se utiliza el método iterativo para resolver la radiacion
+
+Se utiliza el método iterativo para resolver la radiación con relajación
 
 \begin{equation}
 \begin{cases}
-	\Cme{T}^{n+1} =  \MK ^{-1}  \left(\CR^{n+\frac{1}{2}}- \MK \Cme{T}^{n}\right)\\
-	\CR^{n+\frac{1}{2}} = \Cme{R_{\mathrm{generado}}}+ \Cme{R_{\mathrm{rad}}}^{n}  
+	\Cme{T_\sx}^{n+1}_{\mathrm{unrelaxed}} =  \Mme{K_\xx} ^{-1}  \left(\Cme{R_\sx}^{n} - \Mme{K_\xc} \Cme{T_\scc}^{n}\right)\\
+	\CR^{n} = \Cme{R_{\mathrm{generado}}}+ \Cme{R_{\mathrm{rad}}}^{n} \\
+	\Cme{T}^{n+1} = \Cme{T}^n + \frac{1}{k_R} \cdot \left( \Cme{T}^{n+1}_{\mathrm{unrelaxed}} - \Cme{T}^{n} \right)
 \end{cases}
 \end{equation}
+donde $\Cme{R_{\mathrm{rad}}}^{n}$ está en función de la temperatura de la superficie a temperatura $\Cme{T}^{n}$ y donde $k_R$ es el factor de relajación. Para los casos resueltos se utilizó $k_R=16$.
 
 \section*{Resultados}
+La figura \ref{fig:perfil15} muestra el perfil de temperaturas dentro del satélite en su interior mientras que la figura \ref{fig:perfilsurf15} muestra el perfil superficial del satélite. 
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.4\textwidth]{fig/modelo.eps}
+	\caption{Orientación de gráficos.}
+	\label{fig:modelo}
+\end{figure}
+
 Se puede observar en la figura \ref{fig:Convergencia} como la solución converge tal que el punto más caliente de la superficie está en su centro (figure \ref{fig:perfilinterior}). 
 
-El modelado de la radiación en transitorio conlleva una dinámica fuertemente no lineal. Un sistema simple como un cubo puede devolver perfiles de temperatura que pueden no tener una razón de ser inmediatamente aparente. En la figura \ref{fig:perfilsuperficie} podemos ver como los bordes están mas fríos que el centro de la cara radiadora. Es razonable pensar que los bordes tienen más superficie que los rodea y por ende terminan radiando más que el centro de la cara que se encuentra rodeada por masa. Sin embargo también entra en juego el medio del satélite, el cual se encuentra a una temperatura (300K) más fría que el resto del satélite. El centro se encuentra más cerca a la parte de la cara más caliente, sin embargo, su efecto enfriador se extiende hasta 25\% del camino a la cara, como se puede ver en la figura \ref{fig:perfilinterior}. 
+En la figura \ref{fig:perfilsurf15} se ve como un sistema simple como un cubo puede devolver perfiles de temperatura que pueden no tener una razón de ser inmediatamente aparente. En la figura \ref{fig:perfilsuperficie} podemos ver como los bordes están mas fríos que el centro de la cara radiadora. Es razonable pensar que los bordes tienen más superficie que los rodea y por ende terminan radiando más que el centro de la cara que se encuentra rodeada por masa. Sin embargo también entra en juego el medio del satélite, el cual se encuentra a una temperatura (300K) más fría que el resto del satélite. El centro se encuentra más cerca a la parte de la cara más caliente, sin embargo, su efecto enfriador se extiende hasta 25\% del camino a la cara, como se puede ver en la figura \ref{fig:perfilinterior}. 
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{fig/perfil13.eps}
+	\caption{Perfil de temperaturas para 15 divisiones de lado. El gráfico comienza sobre el medio de la superficie del satélite ($x=0$) y continúa hasta llegar al centro del satélite ($x=0,4$m).  }
+	\label{fig:perfil15}
+\end{figure}
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{fig/perfilsurf15.eps}
+	\caption{Perfil de temperaturas de la superficie para 15 divisiones de lado. }
+	\label{fig:perfilsurf15}
+\end{figure}
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{fig/calorint15.eps}
+	\caption{Calor intercambiado de la superficie con el espacio. 15 divisiones de lado.}
+	\label{fig:calor}
+\end{figure}
 
 \section*{Conclusión}
-En conclusión, la radiacion conlleva una fuerte no linealidad la cual debe ser considerada y resuelta iterando cuando no se tiene otros efectos que dominen en las superficies, como la conveccion. 
+En conclusión, la radiación conlleva una fuerte no linealidad la cual debe ser considerada y resuelta iterando cuando no se tiene otros efectos que dominen en las superficies, como la conveccion. 
 
-\begin{figure}[htb!]
-	\centering
-	\begin{subfigure}{0.47\textwidth}
-\includegraphics[width=\textwidth]{fig/conv64.eps}
-\label{fig:Convergencia64}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}{0.5\textwidth}
-	\includegraphics[width=\textwidth]{fig/conv512.eps}
-\label{fig:Convergencia512}
-	\end{subfigure}
-\caption{Cada punto representa una iteración. Se gráfico una temperatura de interior $T_i$ cerca del centro y otra sobre la superficie radiante del satélite $T_s$ para distintas cantidades de elementos.}
-\label{fig:Convergencia}
-\end{figure}
-
-\begin{figure}[htb!]
-	\centering
-	\begin{subfigure}{0.49\textwidth}
-	\centering
-\includegraphics[width=\linewidth]{fig/conv1000.eps}
-\label{fig:Convergencia1000}
-\caption{Convergencia ocurre para una temperatura sobre la superficie de 310K,
-	aproximadamente.}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}{0.49\textwidth}
-	\centering
-	\includegraphics[width=\linewidth]{fig/osc1000.eps}
-	\label{fig:Oscilacion1000}
-\caption{Convergencia ocurre para una temperatura sobre la superficie de 310K,
-	aproximadamente.}
-	\end{subfigure}
-	\caption{Cada punto representa una iteración. Se gráfico una temperatura de interior $T_i$ cerca del centro y otra sobre la superficie radiante del satélite $T_s$ para distintas cantidades de elementos.}
-	\label{fig:ConvergenciaTotal}
-\end{figure}
-
-
-
-
-
-
-\begin{figure}[htb!]
-	\centering
-	\begin{subfigure}{0.49\textwidth}
-		\includegraphics[width=1\textwidth]{fig/perfil11div.eps}
-		\caption{$x=0,4$m es el centro del satélite y $x=0$m es la superficie.}
-		\label{fig:perfilinterior}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}{0.49\textwidth}
-		\includegraphics[width=\textwidth]{fig/perfilRad11div.eps}
-		\caption{$x=0,4$m es en el borde del satélite y $x=0$m es en el centro de la superficie.}
-		\label{fig:perfilsuperficie}
-	\end{subfigure}
-\caption{Nota: los puntos $x=0,4$m coinciden en ambos gráficos.}
-\end{figure}
 
 
 %\bibliography{labibliografia} % Indica archivo

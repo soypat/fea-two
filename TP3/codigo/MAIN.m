@@ -9,7 +9,7 @@ volumen = L*L*L/8;
 funcforma
 
 % MODIFICAS CANTIDAD DE ELEMENTOS
-div = 11;
+div = 15;
 div2=ceil(9/2);
 
 [nodos, ~,elementos] = mesh3D([0 L/2;0 L/2;0 L/2],[div div div]);
@@ -109,7 +109,7 @@ prepRad %Preparo optimizador de radiación (guardo funcformas en puntos gauss)
 keepGoing=true;
 i=1;
 T(xx)=2.7;%Condicion inicial para que converga
-relajacion = 8;
+relajacion = 16;
 relajar=1/relajacion;
 
 while keepGoing
@@ -149,7 +149,7 @@ legend('T_i','T_s')
 grid on
 figure(2)
 plot(xv,T(xnv),'k--^')
-title('Perfil de temperaturas Centro-Superficie')
+title(sprintf('Perfil de temperaturas Centro-Superficie [%0.0f]',Nelem))
 xlabel('x [m]')
 ylabel('Temperatura [K]')
 grid on
