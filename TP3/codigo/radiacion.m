@@ -15,8 +15,9 @@ for e = 1:Nelem
             k=k+1;
             r = zeros(4,1);
             supindex = index(supnod(s,:));
-            Tupg=0;
+            
             for ipg = 1:npgs %Acá comienza la integracion sobre superficie
+                Tupg=0;
                 J = dNauxs{s}{ipg}*elenod;
                 Djac = det(J(1:2,1:2));
                 AreaRad=AreaRad+Djac;
@@ -28,7 +29,7 @@ for e = 1:Nelem
                 for n=1:Nnodporelem
                     Tupg = Tupg + T(index(n))*Ns{s}(ipg,n);
                 end
-                Tupg = T(index)'*Ns{s}(ipg,:)'; %interpolacion
+%                 Tupg = T(index)'*Ns{s}(ipg,:)'; %interpolacion
                 r = r-Ns{s}(ipg,supnod(s,:))'*boltz*(Tupg.^4 - Trad)*Djac*wpg(ipg);%Ojo, es negativo porque el calor se ``va''
             end
             Rrad(supindex)=Rrad(supindex)+r;

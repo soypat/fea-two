@@ -124,13 +124,15 @@ for i_t=1:Niter
 for e=[basaMotor(:,1)',fijoBasa(:,1)']
     k=k+1;
     xv=1;
-    Dlocal=D(elemDof(e,:));
+    n1 = nodos(elementos(e,1),:);
+    n2 = nodos(elementos(e,2),:);
+    [~, T]=vigorotar(zeros(12),n1,n2,[0 0 1]);
+    Dlocal=T'*D(elemDof(e,:));
     % 1  2  3   4    5    6
     % u  v  w  phi  psi  tita
     u1=Dlocal(1);v1=Dlocal(2);w1=Dlocal(3);ph1=Dlocal(4); p1=Dlocal(5); t1=Dlocal(6);
     u2=Dlocal(7);v2=Dlocal(8);w2=Dlocal(9);ph2=Dlocal(10);p2=Dlocal(11);t2=Dlocal(12);
-    n1 = nodos(elementos(e,1),:);
-    n2 = nodos(elementos(e,2),:);
+
 
     Le=norm(n2-n1);
     ay=12*E*Iy/(Jtors*G*A*Le^2);

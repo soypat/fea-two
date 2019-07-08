@@ -51,8 +51,8 @@ for e = 1:Nvigas
     n1=nodos(elementos(e,1),:);n2=nodos(elementos(e,2),:);
     Le=norm(n2-n1);
     [ke, me] = vigastiffness(E,nu,rho,A,Iz,Iy,Jtors,Le);
-    Ke = vigorotar(ke,n1,n2,[0 0 1]);
-    Me = vigorotar(me,n1,n2,[0 0 1]);
+    [Ke,~] = vigorotar(ke,n1,n2,[0 0 1]);
+    [Me,~] = vigorotar(me,n1,n2,[0 0 1]);
     
     K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
     M(storeTo,storeTo) = M(storeTo,storeTo) + Me;
@@ -68,7 +68,7 @@ for e = 1:Nrigid %Unimos barras a la masa, para sustituir lo que seria un rigid 
     storeTo = [n2d6(red(e)) n2d6(masa)];
     n1=nodos(red(e),:);n2=nodos(masa,:);
     rigidElementos = [rigidElementos;red(e) masa];
-    Ke = vigorotar(ke,n1,n2,[0 0 -1]);
+    [Ke,~] = vigorotar(ke,n1,n2,[0 0 -1]);
     K(storeTo,storeTo) = K(storeTo,storeTo) + Ke;
 end
 
@@ -124,14 +124,16 @@ clear x
 xv = [0,1]; % puntos de interpolacion
 
 for e = 1:Nvigas
-    Dlocal=D(elemDof(e,:));
+    n1 = nodos(elementos(e,1),:);
+    n2 = nodos(elementos(e,2),:);
+    [~, T]=vigorotar(zeros(12),n1,n2,[0 0 1]);
+    Dlocal=T'*D(elemDof(e,:));
+    
     % 1  2  3   4    5    6
     % u  v  w  phi  psi  tita
     u1=Dlocal(1);v1=Dlocal(2);w1=Dlocal(3);ph1=Dlocal(4); p1=Dlocal(5); t1=Dlocal(6);
     u2=Dlocal(7);v2=Dlocal(8);w2=Dlocal(9);ph2=Dlocal(10);p2=Dlocal(11);t2=Dlocal(12);
-    n1 = nodos(elementos(e,1),:);
-    n2 = nodos(elementos(e,2),:);
-
+    
     Le=norm(n2-n1);
     ay=12*E*Iy/(Jtors*G*A*Le^2);
     az = 12*E*Iz/(Jtors*G*A*Le^2);
@@ -169,7 +171,7 @@ end
 maxsig
 figure(6)
 resonance
-return
+
 figure(1)
 tensionesBulones
 

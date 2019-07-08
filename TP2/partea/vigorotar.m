@@ -1,4 +1,4 @@
-function [Ke]=vigorotar(Kl,n1,n2,sz)
+function [Ke,T]=vigorotar(Kl,n1,n2,sz)
 %sz es la auxiliar
 vx=n2-n1;
 vy =cross(sz,vx);
