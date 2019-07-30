@@ -28,7 +28,7 @@ function [Ke,Me] = vigastiffness(E,nu,rho,A,Iz,Iy,K,L)
     a=L;
     rx=sqrt(Iz/A);
     Mediag = blkdiag(70,78,78,70*rx^2,8*a^2, 8*a^2, 70, 78, 78, 70*rx^2,8*a^2,8*a^2);
-    Me = rho*A*L/105 * [D 0 0 0 0 0 35 0 0 0 0 0;
+    Me =  [D 0 0 0 0 0 35 0 0 0 0 0;
                         0 D 0 0 0 22*a 0 27 0 0 0 -13*a;
                         0 0 D 0 -22*a 0 0 0 27 0 13*a 0;
                         0 0 0 D 0 0 0 0 0 -35*rx^2 0 0;
@@ -40,6 +40,6 @@ function [Ke,Me] = vigastiffness(E,nu,rho,A,Iz,Iy,K,L)
                         0 0 0 0 0 0 0 0 0 D 0 0;
                         0 0 0 0 0 0 0 0 0 0 D 0;
                         0 0 0 0 0 0 0 0 0 0 0 D];
-   Me = Me+Me'+Mediag;
+   Me = rho*A*L/210 *(Me+Me'+Mediag);
 end
 
