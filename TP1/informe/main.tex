@@ -276,7 +276,7 @@ La simetría es aplicada de forma que se vean esfuerzos generados por el equilib
 
 
 \subsection{Resultados y optimización}
-Debido a la acción ondulatoria de las olas\footnote{Conocido como esfuerzos de quebranto/arrufo.} el buque en realidad puede ser sometido a una presión aún mayor, por eso se va tomar un factor de seguridad $n=3$ para optimizar.
+Debido a la acción ondulatoria de las olas\footnote{Conocido como esfuerzos de quebranto/arrufo.} el buque en realidad puede ser sometido a una presión aún mayor, por eso se va tomar un factor de seguridad $n=2$ para optimizar.
 
 La gran ventaja del método elementos finitos es el rápido prototipado y obtención de resultados. En meros minutos de modificar las dimensiones del sistema en cuestión el usuario se puede hacer una idea de la relación entre dimensiones y tensiones.
 
@@ -289,7 +289,7 @@ Como se puede ver, los esfuerzos se regularizan al acercarse al borde transversa
  \begin{subfigure}{0.49\textwidth}
  % \begingroup
  \begin{framed}
- \includegraphics[height=3.3cm,draft]{fig/longitudinales_a.png}
+ \includegraphics[height=3.3cm]{fig/longitudinales_a.png}
  \caption{Vista de los elementos viga. Perfiles superiores son los $280\times 13\si{\milli \meter}$. $\sigma_{vm_{\max}}= 64,09 $\si{\mega \pascal}.}
  \label{fig:longitudinalesCasoA}
  \end{framed}
@@ -297,8 +297,8 @@ Como se puede ver, los esfuerzos se regularizan al acercarse al borde transversa
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
  \begin{framed}
- \includegraphics[height=3.3cm,draft]{fig/varengas_a.png}
- \caption{Vista de los elementos cascaras del doble fondo. $\sigma_{vm_{\max}}= 112,67 $\si{\mega \pascal}.}
+ \includegraphics[height=3.3cm]{fig/varengas_a.png}
+ \caption{Vista de los elementos cascaras del doble fondo de un modelo simplificado. $\sigma_{vm_{\max}}= 112,67 $\si{\mega \pascal}.}
  \label{fig:VarengasCasoA}
  \end{framed}
  \end{subfigure}
@@ -307,7 +307,7 @@ Como se puede ver, los esfuerzos se regularizan al acercarse al borde transversa
  \end{figure}
 
 \subsubsection*{Proceso de optimización}
-El material a usar para todos los elementos es el acero AISI 4340 \emph{annealed} con una tensión admisible de \SI{470}{\mega \pascal}.
+El material a usar para todos los elementos es el acero AISI 1020 recocido o \emph{annealed} con una tensión de fluencia de \SI{300}{\mega \pascal}.
 
 El proceso de optimización fue iterativo, cambiando los espesores de las vagras, varengas y fondos hasta que todos tengan una zona que este cerca de $\sigma_{\adm}=\frac{\sigma_{y}}{n}\approx\SI{150}{\mega \pascal}$. También se redujeron las secciones de las longitudinales.
 \begin{itemize}
